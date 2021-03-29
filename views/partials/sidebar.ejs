@@ -1,0 +1,41 @@
+<div class="p-3 bg-dark border-end border-dark" style="width: 300px;">
+    <ul class="list-unstyled ps-0 text-white">
+        <li><a href="/" class="link-light"><i class="fas fa-home fa-2x"></i></a></li>
+        <li class="border-top my-3"></li>
+        <li class="mb-1">
+            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#inventory-collapse" aria-expanded="false">
+            Inventory
+            </button>
+            <div class="collapse <% if (pageTitle == "Menu Inventory" || pageTitle == "Ingredients Inventory") {%> <%="show"%><% } %>" id="inventory-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li><a href="/menu_inventory" class="link-light rounded">Menu Inventory</a></li>
+                    <li><a href="/ingredients_inventory" class="link-light rounded">Ingredients Inventory</a></li>
+                </ul>
+            </div>
+         </li>
+        <li class="mb-1">
+            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
+            Orders
+            </button>
+            <div class="collapse" id="dashboard-collapse">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                <li><a href="/dinein_orders" class="link-light rounded">Dine-In Orders</a></li>
+                <li><a href="/delivery_orders" class="link-light rounded">Delivery Orders</a></li>
+            </ul>
+            </div>
+        </li>
+        <li class="mb-1">
+            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
+            Kitchen Order Tickets
+            </button>
+            <div class="collapse" id="orders-collapse">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                <li><a href="/new_kot" class="link-light rounded">New</a></li>
+                <li><a href="/pending_kot" class="link-light rounded">Pending</a></li>
+                <li><a href="/completed_kot" class="link-light rounded">Completed</a></li>
+            </ul>
+            </div>
+        </li>
+        <li class="border-top my-3"></li>
+    </ul>
+  </div>

@@ -1,0 +1,11 @@
+body{
+    display:flex;
+    height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#ipays_title{
+    color: rgb(207, 117, 0);
+    font-size: 30px;
+}

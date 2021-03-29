@@ -1,0 +1,159 @@
+<div class="d-flex flex-row justify-content-end">
+    <div class="input-group mb-3 w-25 me-auto">
+        <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1">
+    </div>
+    <button type="button" class="btn btn-success h-50" data-bs-toggle="modal" data-bs-target="#add_product"><b>Add New Product&nbsp;</b> <i class="fas fa-plus-circle"></i></button>
+    <button type="button" class="btn btn-danger h-50 ms-3" data-bs-toggle="modal" data-bs-target="#remove_product"><b>Remove Product&nbsp;</b> <i class="fas fa-minus-circle"></i></button>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="checkAll" onchange="checkAll()">
+                </div>  
+            </th>
+            <th scope="col">#</th>
+            <th scope="col">Image</th>
+            <th scope="col">Category</th>
+            <th scope="col">Product Name</th>
+            <th scope="col">Price</th>
+            <th scope="col">Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <%var id = 1%>
+        <% for(menuItem of tableData){ %>
+            <tr>
+                <td><input class="form-check-input" type="checkbox" value='<%=id%>' id="check_<%=id%>" name="checkRow">
+                <td><%=id%></td>
+                <td>
+                    <a href="/menuImages/<%=menuItem["menuImage"]%>">
+                        <img src="/menuImages/<%=menuItem["menuImage"]%>" alt="" srcset="" height="30px">
+                    </a>
+                </td>
+                <td><%=menuItem["menuCategory"]%></td>
+                <td><%=menuItem["menuName"]%></td>
+                <td>₱<%=parseFloat(menuItem["menuPrice"]).toFixed(2)%></td>
+                <td>    
+                    <% if (menuItem["menuStatus"]) { %>
+                        <button class="btn-sm btn-success rounded-pill"><b>True</b></button>
+                    <% } else {%>
+                        <button class="btn-sm btn-danger rounded-pill"><b>False</b></button>
+                    <% } %>
+                </td>
+                <td>
+                    <a href=""><i class="fas fa-edit"></i></a>
+                </td>
+            </tr>
+            <%id++%>
+        <%}%>
+    </tbody>
+</table>
+
+<!-- Add Product Modal -->
+<div class="modal fade " id="add_product" tabindex="-1" aria-labelledby="addProductModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <!-- Title -->
+        <div class="modal-header">
+            <h5 class="modal-title" id="addProductModal">Add Product</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form action="addNewProduct" method="POST">
+                <!-- ID -->
+                <div class="mb-3 row">
+                    <label for="productId" class="col-sm-2 col-form-label">ID</label>
+                    <div class="col-sm-10">
+                        <input type="text" readonly class="form-control-plaintext" id="productId" value=<%=id%> name="menuID">
+                    </div>
+                </div>
+                <!-- Image -->
+                <div class="mb-3 row">
+                    <label for="inputImage" class="col-sm-2 col-form-label">Image</label>
+                    <div class="col-sm-10 d-flex flex-row">
+                        <input type="file" class="form-control" id="inputImage" name="menuImage">
+                    </div>
+                </div>  
+                <!-- Category -->
+                <div class="mb-3 row">
+                    <label for="selectMenuCategory" class="col-sm-2 col-form-label">Category</label>
+                    <div class="col-sm-10">
+                        <select class="form-select" size="3" aria-label="selectMenuCategory" id="selectMenuCategory" name="menuCategory">
+                            <!-- EJS MENU CATEGORIES -->
+                            <option value="Chicken">Chicken</option>
+                        </select>
+                        <div class="btn-group mt-3">
+                            <a class="btn btn-success">+</a>
+                            <a class="btn btn-danger">-</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product Name -->
+                <div class="mb-3 row">
+                    <label for="productName" class="col-sm-2 col-form-label">Product Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="productName" name="menuName">
+                    </div>
+                </div>
+                <!-- Price -->
+                <div class="mb-3 row">
+                    <label for="productPrice" class="col-sm-2 col-form-label">Price</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            <input type="number" min="1" step="any" class="form-control" id="productPrice" name="menuPrice">
+                        </div>
+                    </div>
+                </div>
+                <!-- Button Row -->
+                <div class="mb-3 row">
+                    <div class="d-flex flex-row justify-content-end">
+                        <button class="btn btn-success" type="submit">Add</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Remove Product Modal -->
+<div class="modal fade " id="remove_product" tabindex="-1" aria-labelledby="removeProductModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductModal">Remove Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    <input class="form-check-input" type="checkbox" value="" id="toBeRemoved">
+                    <label class="form-check-label" for="toBeRemoved"></label>  
+                  </li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger">Remove</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script>
+    function checkAll(){
+        var checkAll = document.getElementById("checkAll");
+        var checkRows = document.getElementsByName("checkRow");
+
+        if(checkAll.checked) for(row of checkRows)row.checked = true;
+        else for(row of checkRows) row.checked = false;
+    }
+</script>
