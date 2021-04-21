@@ -14,9 +14,16 @@
         <div class="d-flex justify-content-around pt-4" id="">
             <div class="container-fluid">
                 <h1><b><%=pageTitle%></b></h1>
-                <% if (pageTitle == "Menu Inventory") { %>
+                <% if (pageTitle =="Home") { %>
+                    <div class="card w-25 mt-2 ms-2 bg-dark text-light">
+                        <img src="/assets/orderPreview.png" class="card-img-top rounded">
+                        <div class="card-body flex-row-reverse d-flex">
+                          <a href="" class="btn btn-primary">Go to Ordering Menu</a>
+                        </div>
+                    </div> 
+                <% } else if (pageTitle == "Menu Management") { %>
                     <%- include('./partials/menu_inventory') %>
-                <% } else if (pageTitle == "Ingredients Inventory") { %>
+                <% } else if (pageTitle == "Inventory Management") { %>
                     <%- include('./partials/ingredients_inventory') %>
                 <% } %>
             </div>

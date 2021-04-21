@@ -26,6 +26,5 @@ const menuItemSchema = new Schema(
     }, {timestamps: true}
 );
 
-
 const MenuItemData = mongoose.model('menu_inventory', menuItemSchema);
 module.exports = MenuItemData;
