@@ -1,0 +1,854 @@
+<div class="d-flex flex-row justify-content-end">
+    <div class="input-group mb-3 w-25 me-auto">
+        <input type="search" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" id="searchBar" onkeyup="searchMenuList()" onsearch="searchMenuList()">
+    </div>
+    <button type="button" class="btn btn-success h-50 me-3" data-bs-toggle="modal" data-bs-target="#addMenuItem" onclick="initializeAddId()"><b>Add New Menu Item&nbsp;</b> <i class="fas fa-plus-circle"></i></button>
+    <button type="button" class="btn btn-danger h-50 me-3" data-bs-toggle="modal" data-bs-target="#removeMenuItem"><b>Remove Menu Item&nbsp;</b> <i class="fas fa-minus-circle"></i></button>
+    <button type="button" class="btn btn-primary h-50" data-bs-toggle="modal" data-bs-target="#editCategory"><b>Edit Categories&nbsp;</b> <i class="fas fa-clipboard-list"></i></button>
+</div>
+
+<table class="table table-striped table-hover" id="menuListTable">
+    <thead>
+        <tr>
+            <th scope="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="mainCheck" onchange="checkAll()">
+                </div>  
+            </th>
+            <th scope="col">ID</th>
+            <th scope="col">Image</th>
+            <th scope="col">Category</th>
+            <th scope="col">Menu Item</th>
+            <th scope="col">Price</th>
+            <th scope="col">Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+    </tbody>
+</table>
+
+<!-- Add Menu Item Modal -->
+<div class="modal fade" id="addMenuItem" tabindex="-1" aria-labelledby="addMenuItemModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <!-- Title -->
+        <div class="modal-header bg-success">
+            <h5 class="modal-title text-light" id="addMenuItemModal">Add Menu Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="addMenuItem(); return false">
+                <!-- Menu Item Name -->
+                <div class="mb-3 row">
+                    <label for="productName" class="col-sm-2 col-form-label">Item Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="addItemName" required>
+                    </div>
+                </div>
+                <!-- Image -->
+                <div class="mb-3 row">
+                    <label for="addImagePath" class="col-sm-2 col-form-label">Image</label>
+                    <div class="col-sm-10 d-flex flex-row">
+                        <input type="file" class="form-control" id="addImagePath" required>
+                    </div>
+                </div>  
+                <!-- Category -->
+                <div class="mb-3 row">
+                    <label for="addItemCategory" class="col-sm-2 col-form-label">Category</label>
+                    <div class="col-sm-10">
+                        <select class="form-select" size="3" aria-label="selectMenuCategory" id="addItemCategory" required>
+                        </select>
+                    </div>
+                </div>
+                <!-- Price -->
+                <div class="mb-3 row">
+                    <label for="productPrice" class="col-sm-2 col-form-label">Price</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            <input type="number" min="1" step="any" class="form-control" id="addItemPrice" required>
+                        </div>
+                    </div>
+                </div>
+                <!-- Button Row -->
+                <div class="mb-3 row">
+                    <div class="d-flex flex-row-reverse">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-success me-2" type="submit">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Remove Menu Item Modal -->
+<div class="modal fade" id="removeMenuItem" tabindex="-1" aria-labelledby="removeMenuItemModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title text-white" id="removeMenuItemModal">Remove Menu Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4><b>Are you sure you want to remove these items?</b></h4>
+                <form onsubmit="removeMenuItems(); return false;">
+                    <div class="card mb-3">
+                        <ul class="list-group list-group-flush" id="toBeRemovedRows">
+                            <h3 class='m-2'><b class='p-3 text-danger'>No Items Selected</b></h3>
+                        </ul>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="d-flex flex-row-reverse">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-danger me-2" type="submit">Remove</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Menu Item Modal -->
+<div class="modal fade" id="editMenuItem" tabindex="-1" aria-labelledby="editMenuItemModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <!-- Title -->
+        <div class="modal-header bg-primary">
+            <h5 class="modal-title text-light" id="editMenuItemModal">Edit Menu Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="editMenuItem(); return false">
+                <!-- Search -->
+                <input type="text" hidden id="editIsSearch" value="">
+                <!-- ID -->
+                <input type="text" hidden id="editItemId" value="">
+                <!-- Menu Item Name -->
+                <div class="mb-3 row">
+                    <label for="productName" class="col-sm-2 col-form-label">Menu Item</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="editItemName" required>
+                    </div>
+                </div>
+                <!-- Image -->
+                <div class="mb-3 row">
+                    <label for="inputImage" class="col-sm-2 col-form-label">Image</label>
+                    <div class="col-sm-10 d-flex flex-row">
+                        <input type="file" class="form-control" id="editImagePath" required>
+                    </div>
+                </div>  
+                <!-- Category -->
+                <div class="mb-3 row">
+                    <label for="editItemCategory" class="col-sm-2 col-form-label">Category</label>
+                    <div class="col-sm-10">
+                        <select class="form-select" size="3" aria-label="selectMenuCategory" id="editItemCategory" required>
+                        </select>
+                    </div>
+                </div>
+                <!-- Price -->
+                <div class="mb-3 row">
+                    <label for="productPrice" class="col-sm-2 col-form-label">Price</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            <input type="number" min="1" step="any" class="form-control" id="editItemPrice" required>
+                        </div>
+                    </div>
+                </div>
+                <!-- Button Row -->
+                <div class="mb-3 row">
+                    <div class="d-flex flex-row-reverse">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary me-2" type="submit">Edit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Edit Menu Categories Modal-->
+<div class="modal fade" id="editCategory" tabindex="-1" aria-labelledby="editCategoryModal" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white" id="editCategoryModal">Edit Menu Categories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Add Category" id="addCategory">
+                    <button class="btn btn-success" type="button" onclick="addCategoryRow()">Submit</button>
+                </div>
+                <form onsubmit="editCategories(); return false">
+                    <table class="table" id="categoryTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Category Name</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div class="mb-3 row">
+                        <div class="d-flex flex-row-reverse">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-primary me-2" type="submit">Submit Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recipe Management Modal -->
+<div class="modal fade" id="recipeManagement" tabindex="-1" aria-labelledby="recipeManagementModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+        <!-- Title -->
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">Recipe Management</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="editRecipe(); return false">
+                    <input type="text" hidden id="recipeMenuItemId" value="">
+                    <table class="table" id="recipeTable">
+                        <caption class="caption-top" id="recipeModalCaption"></caption>
+                        <thead>
+                            <tr>
+                                <th style="width: 50%">Ingredient Name</th>
+                                <th style="width: 25%">Unit of Measure</th>
+                                <th style="width: 25%">Unit Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>     
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>
+                                    <div class="d-flex flex-row">
+                                        <a class="btn" onclick="addRecipeRow()"><b><i class="fas fa-plus-circle text-success"></i></b></a>
+                                        <a class="btn" onclick="removeRecipeRow()"><b><i class="fas fa-minus-circle text-danger"></i></b></a>
+                                    </div>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="mb-3 row">
+                        <div class="d-flex flex-row-reverse">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-warning me-2" type="submit">Edit Recipe</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container position-fixed bottom-0 end-0" id="toastContainer">
+    <!-- Success Toast -->
+    <div class="pe-2 pb-2" style="z-index: 5; font-size:1.5rem">
+        <div id="successToast" class="toast hide align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="successToastMessage">
+                    <span><strong></strong></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <!-- Danger Toast -->
+    <div class="pe-2 pb-2" style="z-index: 5; font-size:1.5rem">
+        <div id="dangerToast" class="toast hide align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="dangerToastMessage">
+                    <span><strong></strong></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    var menuList = {};
+    var categories = {};
+    var inventoryList = {};
+    var unitList = {};
+
+    $(document).ready(function (){
+        getMenuList();
+        getMenuCategories();
+        getInventoryList();
+        getUnitList();
+    });
+
+    // For checkboxes
+    var checkedRowsArray = [];
+    var checkedRowItems;
+    var checkRows = document.getElementsByName("checkRow");
+    var mainCheck = document.getElementById("mainCheck");
+    var removeList = document.getElementById("toBeRemovedRows");
+
+    // For modals
+    var addMenuItemModal = document.getElementById("addMenuItem");
+    var editMenuItemModal = document.getElementById("editMenuItem");
+    var editCategoryModal = document.getElementById("editCategory");
+    var recipeManagementModal = document.getElementById("recipeManagement");
+
+    var addCategory = document.getElementById("addCategory");
+    var recipeTable = document.getElementById("recipeTable");
+    var editCategoryTable = document.getElementById("categoryTable");
+    
+    // Get Menu List Data
+    function getMenuList(){
+        $.ajax({
+            url: "menu_list"
+        }).done(function(data){
+            menuList = data;
+            loadTable();
+        });
+    }
+    // Get Menu Category Data
+    function getMenuCategories(){
+        $.ajax({
+            url: "menu_category"
+        }).done(function(data){
+            categories = data;
+            reloadCategories();
+        });
+    }
+    // Get Inventory List Data
+    function getInventoryList(){
+        $.ajax({
+            url: "inventory_list"
+        }).done(function(data){
+            inventoryList = data;
+        });
+    }
+    // Get Unit List Data
+    function getUnitList(){
+        $.ajax({
+            url: "inventory_units"
+        }).done(function(data){
+            unitList = data;
+        });
+    }
+
+    // Load the table
+    function loadTable(){
+        resetCheckboxes();
+        $("#tableBody tr").remove();
+        var id = 1;
+        for(item of menuList){
+            var row = 
+            `<tr>
+                <td><input class="form-check-input" type="checkbox" value='`+item["_id"]+`' name="checkRow" onchange="checkedRow()"></td>
+                <td>`+id+`</td>
+                <td>
+                    <a href="/menuImages/`+item["menuImage"]+`">
+                        <img class="rounded" src="/menuImages/`+item["menuImage"]+`" alt="" srcset="" height="30px">
+                    </a>
+                </td>
+                <td>`+item["menuCategory"]+`</td>
+                <td>`+item["menuName"]+`</td>
+                <td>₱`+parseFloat(item["menuPrice"]["$numberDecimal"]).toFixed(2)+`</td>
+                <td>`;
+            
+                if(item["menuStatus"]){
+                    row+=`<button class="btn-sm btn-success rounded-pill" type="button" onclick="changeStatus('`+item["menuStatus"]+`', '`+item["_id"]+`', 'false')"><b>True</b></button>`
+                }else{
+                    row+=`<button class="btn-sm btn-danger rounded-pill" type="button" onclick="changeStatus('`+item["menuStatus"]+`', '`+item["_id"]+`', 'false')"><b>False</b></button>`
+                }
+            row += `</td>
+                <td>
+                    <button class="btn-sm btn-primary" onclick="editModal('`+item["_id"]+`', 'false')" data-bs-toggle="modal" data-bs-target="#editMenuItem">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-sm btn-warning" onclick="recipeModal('`+item["_id"]+`')" data-bs-toggle="modal" data-bs-target="#recipeManagement">
+                        <i class="fas fa-utensils"></i>
+                    </button>
+                </td>
+            </tr>`;
+            id++;
+            $("#tableBody").append(row);
+        }
+    }    
+    // Search function for table
+    function searchMenuList(){
+        resetCheckboxes();
+        var searchValue = document.getElementById("searchBar").value;
+        var id = 1;
+        $.get('search_menu?value=' + searchValue, function(responseText) {
+            $("#tableBody tr").remove();
+            for(item of responseText){
+                var row = 
+                `<tr>
+                    <td><input class="form-check-input" type="checkbox" value='`+item["_id"]+`' name="checkRow" onchange="checkedRow()"></td>
+                    <td>`+id+`</td>
+                    <td>
+                        <a href="/menuImages/`+item["menuImage"]+`">
+                            <img class="rounded" src="/menuImages/`+item["menuImage"]+`" alt="" srcset="" height="30px">
+                        </a>
+                    </td>
+                    <td>`+item["menuCategory"]+`</td>
+                    <td>`+item["menuName"]+`</td>
+                    <td>₱`+parseFloat(item["menuPrice"]["$numberDecimal"]).toFixed(2)+`</td>
+                    <td>`
+                        if(item["menuStatus"]) row += `<button class="btn-sm btn-success rounded-pill" type="button" onclick="changeStatus('`+item["menuStatus"]+`', '`+item["_id"]+`', 'true')"><b>True</b></button>`;
+                        else row += `<button class="btn-sm btn-danger rounded-pill" type="button" onclick="changeStatus('`+item["menuStatus"]+`', '`+item["_id"]+`', 'true')"><b>False</b></button>`;
+            row += `</td>
+                    <td>
+                        <button class="btn-sm btn-primary" onclick="editModal('`+item["_id"]+`', 'true')" data-bs-toggle="modal" data-bs-target="#editMenuItem">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-sm btn-warning" onclick="recipeModal('`+item["_id"]+`')" data-bs-toggle="modal" data-bs-target="#recipeManagement">
+                            <i class="fas fa-utensils"></i>
+                        </button>
+                    </td>
+                </tr>`;
+                id++;
+                $("#tableBody").append(row);
+            }
+        });
+    }
+    
+    // Initalize the ID for Add Modal
+    function initializeAddId(){
+        var menuTable = document.getElementById("menuListTable");
+        $("#addItemId").val(menuTable.rows.length);
+    }
+    // Gets data of selected row and transfers it to the modal.
+    function editModal(menuID, isSearch){
+        var editItem;
+        for(item of menuList) if(item["_id"] == menuID) editItem = item;
+
+        $("#editIsSearch").val(isSearch);
+        $("#editItemId").val(editItem["_id"]);
+        $("#editItemCategory").val(editItem["menuCategory"]);
+        $("#editItemName").val(editItem["menuName"]);
+        $("#editItemPrice").val(editItem["menuPrice"]["$numberDecimal"]);
+    }
+    // Checks all the checkboxes when the main check box is checked.
+    function checkAll(){
+        checkedRowsArray = []; //Clear checked checkboxes first.
+        if(mainCheck.checked){ //If Main Check is checked, loop through all checkboxes and change value to true.
+            for(row of checkRows){
+                row.checked = true;
+                checkedRowsArray.push(row.value);
+            }
+            if(checkedRowsArray.length > 0){
+                checkedRowItems = checkedRowsArray.map(id => {
+                    for(menuItem of menuList){
+                        if(menuItem["_id"] == id) {
+                            return `<li class="list-group-item"><input class="form-check-input" type="checkbox" value="`+ menuItem["_id"] +`" name="toBeRemovedItem" checked><label class="form-check-label ps-3" for="toBeRemovedItem">`+ menuItem["menuName"] +`</label></li>`
+                        }
+                    }
+                })
+                removeList.innerHTML = checkedRowItems.join('');
+            }
+            else removeList.innerHTML = "<h2 class='m-2'><b class='p-3 text-danger'>No Items Selected</b></h2>";
+        }
+        else {
+            for(row of checkRows) row.checked = false;
+            checkedRowsArray = [];  
+            removeList.innerHTML = "<h3 class='m-2'><b class='p-3 text-danger'>No Items Selected</b></h3>";
+        }
+    }
+    // If all checkboxes are checked and user unchecks one, it unchecks the main check box.
+    function checkedRow(){
+        checkedRowsArray = [];
+
+        for(row of checkRows) {
+            if(row.checked) checkedRowsArray.push(row.value);
+
+            if(!row.checked) {mainCheck.checked = false}
+        }
+
+        if(checkedRowsArray.length > 0){
+            checkedRowItems = checkedRowsArray.map(id => {
+                for(menuItem of menuList){
+                    if(menuItem["_id"] == id) {
+                        return `<li class="list-group-item"><input class="form-check-input" type="checkbox" value="`+ menuItem["_id"] +`" name="toBeRemovedItem" checked><label class="form-check-label ps-3" for="toBeRemovedItem">`+ menuItem["menuName"] +`</label></li>`
+                    }
+                }
+            })
+            removeList.innerHTML = checkedRowItems.join('');
+        }
+        else removeList.innerHTML = "<h2><b class='p-3 text-danger'>No Items Selected</b></h2>";
+    };
+    // Reset checkboxes
+    function resetCheckboxes(){
+        mainCheck.checked = false;
+        for(row of checkRows) row.checked = false;
+        checkedRowsArray = [];  
+        removeList.innerHTML = "<h3 class='m-2'><b class='p-3 text-danger'>No Items Selected</b></h3>";
+    }
+    
+    // Add a Row to Categories
+    function addCategoryRow(){
+        var nextRow = editCategoryTable.rows.length;
+        var toBeAddedRow = 
+        `<tr id="categoryRow`+nextRow+`" name="addRow">
+            <td><input hidden value="`+addCategory.value+`" name="categories">`+addCategory.value+`</td>
+            <td>
+                <a class="btn btn-sm text-danger h-25" id="removeCategory" onclick="removeCategoryRow(`+nextRow+`)"><i class="fas fa-minus-circle"></i></a>
+            </td>
+        </tr>`;
+        addCategory.value = "";
+        $("#categoryTable tbody").append(toBeAddedRow);
+    }
+    // Remove a Row from Categories
+    function removeCategoryRow(rowNumber){
+        var row = rowNumber;
+        $("#categoryRow"+row).remove();
+    }
+    // Reload categories if cancelled.
+    function reloadCategories(){
+        $("#editItemCategory option").remove();
+        $("#addItemCategory option").remove();
+        $("#categoryTable tbody tr").remove();
+        var id = 1;
+        for(category of categories[0]["categoryArray"]){
+            var toBeAddedOption = "<option value="+category+">"+category+"</option>";
+            var toBeAddedRow = `<tr id="categoryRow`+id+`">
+                <td><input hidden value="`+category+`" name="categories">`+category+`</td>
+                <td>
+                    <a class="btn btn-sm text-danger h-25" id="removeCategory" onclick="removeCategoryRow(`+id+`)"><i class="fas fa-minus-circle"></i></a>
+                </td>                
+            </tr>`;
+
+            $("#editItemCategory").append(toBeAddedOption);
+            $("#addItemCategory").append(toBeAddedOption);
+            $("#categoryTable tbody").append(toBeAddedRow);
+            id++;
+        }
+        
+    }  
+    
+    // Adds a row to recipe management table.
+    function addRecipeRow(){
+        var nextRow = recipeTable.rows.length - 1;
+        var newRow = `<tr id="recipeRow`+ nextRow +`">
+            <td>
+                <select class="form-select" size="1" id="recipeItemName`+nextRow+`" name="recipeItems" required onchange="getMeasure('`+nextRow+`')">
+                    <option disabled selected value></option>`;
+        for(inventoryItem of inventoryList) {
+            if(inventoryItem["inventoryItemCategory"] == "Main Ingredients") {
+                newRow += `<option value="`+inventoryItem["inventoryItemName"]+`">`+inventoryItem["inventoryItemName"]+`</option>`
+            }
+        };
+        newRow += `</select>
+            </td>
+            <td><input type="number" min="1" step="any" class="form-control" id="recipeItemQuantity`+nextRow+`" name="recipeQuantities" required></td>
+            <td>
+                <select class="form-select" size="1" id="recipeItemUnit`+nextRow+`" name="recipeUnits" required>
+                    <option disabled selected value></option>
+                </select>
+            </td>
+        </tr>`;
+        $("#recipeTable tbody").append(newRow);
+    }
+    // Removes row from recipe management table.
+    function removeRecipeRow(){
+        var currentRow = recipeTable.rows.length - 2;
+        console.log(currentRow);
+        $('#recipeRow' + currentRow).remove();
+    }
+    // Fill modal with existing recipes.
+    function fillRecipes(recipeList){
+        var itemNo = 1;
+        recipeList.forEach(function(recipeItem, i) {
+            addRecipeRow();
+            $("#recipeItemName"+itemNo).val(recipeItem["itemName"]);
+            getRecipeMeasure(recipeItem["itemUnit"], itemNo);
+            $("#recipeItemQuantity"+itemNo).val(recipeItem["itemQuantity"]);
+            itemNo++;
+        });
+    }
+    // Opens recipeModal of specific menu item.
+    function recipeModal(itemID){
+        var menuItem;
+        for(item of menuList) if(item["_id"] == itemID) menuItem = item;
+
+        console.log(menuItem);
+        $("#recipeModalCaption").text(menuItem["menuName"]);
+        $("#recipeMenuItemId").val(itemID);
+
+        if(menuItem["menuRecipe"] == null) addRecipeRow();
+        else fillRecipes(menuItem["menuRecipe"]);
+    }
+
+    // Clear add modal values after it is closed.
+    addMenuItemModal.addEventListener('hidden.bs.modal', function(event){
+        $("#addItemId").val("");
+        $("#addImagePath").val("");
+        $("#addItemCategory").val("");
+        $("#addItemName").val("");
+        $("#addItemPrice").val("");
+    });
+    // Reload after the modal is closed.
+    editCategoryModal.addEventListener('hidden.bs.modal', function(event){
+        addCategory.value = "";
+        reloadCategories();
+    });
+    // Clear edit modal values after it is closed.
+    editMenuItemModal.addEventListener('hidden.bs.modal', function(event){
+        $("#editItemId").val("");
+        $("#editImagePath").val("");
+        $("#editItemCategory").val("");
+        $("#editItemName").val("");
+        $("#editItemPrice").val("");
+    });
+    // Clear recipe modal after its closed.
+    recipeManagementModal.addEventListener('hidden.bs.modal', function(event){
+        $("#recipeTable tbody tr").remove();
+    })
+
+    // Add a menu item
+    function addMenuItem(){
+        var menuItem = {
+            menuName: $('#addItemName').val(),
+            menuImage: document.getElementById("addImagePath").files[0].name,
+            menuCategory: $('#addItemCategory').val(),
+            menuPrice: $('#addItemPrice').val(),
+            menuStatus: false,
+            menuRecipe: null,
+        };
+        $.ajax({ 
+            url: '/addMenuItem',
+            type: 'POST',
+            cache: false, 
+            data: menuItem,
+            success: function(data){
+                console.log('Added Menu Item!');
+            }
+            ,error: function(jqXHR, textStatus, err){
+                console.log('Error: '+textStatus+', err '+err)
+            }
+        })
+        .done(function(){
+            getMenuList();
+            $("#addMenuItem").modal('toggle');
+            successToast("Added " + menuItem["menuName"] + "!", 3000);
+        });
+    }
+    // Edit a menu item
+    function editMenuItem(isSearch){
+        var editItem = {
+            menuName: $('#editItemName').val(),
+            menuImage: document.getElementById("editImagePath").files[0].name,
+            menuCategory: $('#editItemCategory').val(),
+            menuPrice: $('#editItemPrice').val(),
+        };
+
+        $.ajax({ 
+            url: '/editMenuItem',
+            type: 'POST',
+            cache: false, 
+            data: {toBeEditedItem: editItem, toBeEditedID: $('#editItemId').val()},
+            success: function(data){
+                console.log('Edited Menu Item!');
+            }
+            ,error: function(jqXHR, textStatus, err){
+                console.log('Error: '+textStatus+', err '+err)
+            }
+        })
+        .done(function(){
+            if(!$("#editIsSearch").val()) getMenuList();
+            else searchMenuList();
+            $("#editMenuItem").modal('toggle');
+            successToast("Edited " + editItem["menuName"] + "!", 3000);
+        });
+    }
+    // Remove menu items
+    function removeMenuItems(){
+        var removeArray = [];
+        var removedItems = document.getElementsByName("toBeRemovedItem");
+        for(i = 0; i < removedItems.length; i++) removeArray.push(removedItems[i].value);
+
+        $.ajax({ 
+            url: '/removeMenuItem',
+            type: 'POST',
+            cache: false, 
+            data: {toBeRemoved: removeArray},
+            success: function(data){
+                console.log('Removed Menu Item/s!');
+            }
+            ,error: function(jqXHR, textStatus, err){
+                console.log('Error: '+textStatus+', err '+err)
+            }
+        })
+        .done(function(){
+            getMenuList();
+            $("#removeMenuItem").modal('toggle');
+            successToast("Removed menu item/s!", 3000);
+        });
+    }
+    // Change Menu Item Status
+    function changeStatus(menuStatus, id, isSearch){
+        $.ajax({
+            url: "/getRecipe?id="+id,
+            success: function(data){
+                console.log('Checked recipe...');
+            }
+            ,error: function(jqXHR, textStatus, err){
+                console.log('Error: '+textStatus+', err '+err)
+            }
+        }).done(function(data){
+            if(data != "") {
+                $.ajax({ 
+                    url: '/updateStatus',
+                    type: 'POST',
+                    cache: false, 
+                    data: {updateID: id, updateStatus: menuStatus}, 
+                    success: function(data){
+                        console.log('Status changed!');
+                    }
+                    ,error: function(jqXHR, textStatus, err){
+                        console.log('Error: '+textStatus+', err '+err)
+                    }
+                })
+                .done(function(){
+                    if(!isSearch) getMenuList();
+                    else searchMenuList();
+                    for(item of menuList) if(item["_id"] == id) successToast("Status changed of " + item["menuName"] + "!", 1500);
+                });
+            }else{
+                dangerToast("Add recipe for this item!", 2000);
+            }
+        });
+
+    }
+    // Edit categories
+    function editCategories(){
+        var editCategoryArray = [];
+        var editedCategories = document.getElementsByName("categories");
+        for(i = 0; i < editedCategories.length; i++) editCategoryArray.push(editedCategories[i].value);
+        
+        $.ajax({ 
+            url: '/editMenuCategory',
+            type: 'POST',
+            cache: false, 
+            data: {editedCategories: editCategoryArray},
+            success: function(data){
+                console.log('Edited Menu Categories!');
+            }
+            ,error: function(jqXHR, textStatus, err){
+                console.log('Error: '+textStatus+', err '+err)
+            }
+        })
+        .done(function(){
+            getMenuCategories();
+            $("#editCategory").modal('toggle');
+            successToast("Categories edited!", 3000);
+        });
+    }
+    // Edit recipe
+    function editRecipe(){
+        var recipeArray = [];
+        var recipeItems = document.getElementsByName("recipeItems");
+        var recipeUnits = document.getElementsByName("recipeUnits");
+        var recipeQuantities = document.getElementsByName("recipeQuantities");
+
+        for(i = 0; i < recipeItems.length; i++) {
+            recipeArray.push({itemName: recipeItems[i].value, itemUnit: recipeUnits[i].value, itemQuantity: recipeQuantities[i].value});
+        };
+
+        $.ajax({ 
+            url: '/editRecipe',
+            type: 'POST',
+            cache: false, 
+            data: {itemID: $("#recipeMenuItemId").val(), recipeList: recipeArray},
+            success: function(data){
+                console.log('Edited Recipe!');
+            }
+            ,error: function(jqXHR, textStatus, err){
+                console.log('Error: '+textStatus+', err '+err)
+            }
+        })
+        .done(function(){
+            getMenuList();
+            $("#recipeManagement").modal('toggle');
+            successToast("Recipe changed!", 3000);
+        });
+    }
+    // Get unit measure of new inventory item
+    function getMeasure(rowNumber){
+        inventoryList.forEach(function(inventoryItem, i) {
+            if(inventoryItem["inventoryItemName"] == $("#recipeItemName" + rowNumber).val()){
+                $("#recipeItemUnit" + rowNumber + " option").remove();
+                if(inventoryItem["inventoryItemUnitMeasure"] == "pkg" || inventoryItem["inventoryItemUnitMeasure"] == "pcs"){
+                    $("#recipeItemUnit" + rowNumber).append($('<option>', { 
+                        value: inventoryItem["inventoryItemUnitMeasure"],
+                        text : inventoryItem["inventoryItemUnitMeasure"], 
+                    }));
+                }else{
+                    $.get('unitMeasure?measure=' + inventoryItem["inventoryItemUnitMeasure"], function(responseText) {
+                        for(unit of responseText){
+                            $("#recipeItemUnit" + rowNumber).append($('<option>', { 
+                                value: unit["abbr"],
+                                text : unit["abbr"] + " (" + unit["plural"] + ")", 
+                            }));
+                        }
+                    });
+                }
+            }
+        })
+    }
+    // Get unit measure of recipe item
+    function getRecipeMeasure(recipeUnit, rowNumber){
+        $("#recipeItemUnit" + rowNumber + " option").remove();
+        if(recipeUnit == "pkg" || recipeUnit == "pcs"){
+            $("#recipeItemUnit" + rowNumber).append($('<option>', { 
+                value: recipeUnit,
+                text : recipeUnit, 
+            }));
+        }else{
+            $.get('unitMeasure?measure=' + recipeUnit, function(responseText) {
+                for(unit of responseText){
+                    $("#recipeItemUnit" + rowNumber).append($('<option>', { 
+                        value: unit["abbr"],
+                        text : unit["abbr"] + " (" + unit["plural"] + ")", 
+                    }));
+                }
+            }).done(function (){
+                $("#recipeItemUnit" + rowNumber).val(recipeUnit);
+            });
+        }
+    }
+
+    // Show Successful toast
+    function successToast(message, time){
+        $("#successToastMessage > span > strong").text(message); //Set toast message. 
+        $("#successToast").toast('show'); //Show toast
+        setTimeout(function(){
+            $("#successToast").toast('hide');
+        }, time)
+    }
+    // Show Danger toast
+    function dangerToast(message, time){
+        $("#dangerToastMessage > span > strong").text(message); //Set toast message. 
+        $("#dangerToast").toast('show'); //Show toast
+        setTimeout(function(){
+            $("#dangerToast").toast('hide');
+        }, time)
+    }
+
+</script>

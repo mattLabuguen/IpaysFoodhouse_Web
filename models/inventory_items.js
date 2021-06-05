@@ -11,23 +11,35 @@ const inventoryItemSchema = new Schema(
             type: String,
             required: true,
         },
-        "inventoryItemSupplier":{
-            type: String,
-            required: true,
-        },
         "inventoryItemCategory":{
             type: String,
             required: true,
         },
-        "inventoryItemUnit":{
+        "inventoryItemUnitQuantity":{
+            type: Number,
+            required: true,
+        },
+        "inventoryItemUnitMeasure":{
             type: String,
+            required: true,
+        },
+        "inventoryItemAmount":{
+            type: Number,
+            required: true,
+        },
+        "inventoryItemUnitMeasure":{
+            type: String,
+            required: true,
+        },
+        "inventoryItemUnitCost":{
+            type: Schema.Types.Decimal128,
             required: true,
         },
         "inventoryItemBefore":{
             type: Schema.Types.Decimal128,
             required: true,
         },
-        "inventoryItemSold":{
+        "inventoryItemUsed":{
             type: Schema.Types.Decimal128,
             required: false,
         },

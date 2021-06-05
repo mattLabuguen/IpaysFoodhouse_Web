@@ -1,0 +1,800 @@
+<html lang="en">
+<head>
+    <%- include('./partials/header') %> 
+</head>
+<body class="d-flex flex-row" id="orderEntryBody">
+    <div class="d-flex flex-column flex-grow-1 text-white menu-bg overflow-auto">
+        <!-- Navbar for Menu Items with Search and Back Button -->
+        <nav class="navbar navbar-dark bg-transparent pt-3 pb-2 ps-3">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="/" style="font-size: 1.5rem;"><i class="fas fa-arrow-left me-3" ></i><strong>Management</strong></a>
+              <div class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="searchBar" onkeyup="searchMenu()" onsearch="searchMenu()">
+              </div>
+            </div>
+        </nav>
+        <!-- Categories -->
+        <ul class="nav nav-pills nav-fill ps-4 pe-4" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active text-white nav-text" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button" role="tab" aria-controls="pills-all" aria-selected="true"><strong>ALL</strong></button>
+            </li>
+            <%for(category of categories[0]["categoryArray"]){%>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-white nav-text" id="pills-<%=category%>-tab" data-bs-toggle="pill" data-bs-target="#pills-<%=category%>" type="button" role="tab" aria-controls="pills-<%=category%>" aria-selected="false"><strong><%=category.toUpperCase();%></strong></button>
+            </li>
+            <%}%>
+        </ul>
+        <!-- Category Content -->
+        <div class="tab-content mt-3 bg-dark rounded ms-4 me-4" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-all" role="tabpanel" aria-labelledby="pills-all-tab">
+                <div class="p-3 d-flex flex-row flex-wrap justify-content-start" id="allMenuItems">
+                    <!-- EJS Loop for All Menu Items-->
+                    <%for (menuItem of menuData){%>
+                        <%if(menuItem["menuStatus"]){ %>
+                        <a class="menu-item-link" onclick="addItem(`<%=menuItem['_id']%>`)">
+                            <div class="d-flex flex-column justify-content-center p-1 me-3 ms-3" style="width: 175px; height: 175px;" >
+                                <img src="/menuImages/<%=menuItem["menuImage"]%>" class="menu-image rounded m-2" alt="...">
+                                <span class="text-center text-nowrap"><strong><%=menuItem["menuName"]%></strong></span>
+                                <span class="text-center text-success"><strong>₱<%=parseFloat(menuItem["menuPrice"]).toFixed(2)%></strong></span>
+                            </div>
+                        </a>
+                        <%}%>
+                    <%}%>
+                </div>
+            </div>
+            <!-- EJS For Loop for the Specific Category of Menu Items -->
+            <%for (category of categories[0]["categoryArray"]){%>   
+            <div class="tab-pane fade" id="pills-<%=category%>" role="tabpanel" aria-labelledby="pills-<%=category%>-tab">
+                <div class="p-3 d-flex flex-row flex-wrap justify-content-start">
+                    <%for(menuItem of menuData){%>
+                        <%if(menuItem["menuStatus"] && menuItem["menuCategory"] == category){ %>
+                        <a class="menu-item-link" onclick="addItem(`<%=menuItem['_id']%>`)">
+                            <div class="d-flex flex-column justify-content-center p-1 me-3 ms-3" style="width: 175px; height: 175px;" >
+                                <img src="/menuImages/<%=menuItem["menuImage"]%>" class="menu-image rounded m-2" alt="...">
+                                <span class="text-center text-nowrap"><strong><%=menuItem["menuName"]%></strong></span>
+                                <span class="text-center text-success"><strong>₱<%=parseFloat(menuItem["menuPrice"]).toFixed(2)%></strong></span>
+                            </div>
+                        </a>
+                        <%}%>
+                    <%}%>
+                </div>
+            </div>       
+            <%}%>
+        </div>
+    </div>
+
+    <!-- Order List -->
+    <div class="d-flex flex-column flex-grow-1">
+        <nav class="navbar navbar-light bg-warning">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1" id="ipays_title"><strong>Ipay's Foodhouse</strong></span>
+            </div>
+        </nav>
+        <div class="container pt-4 ps-3 pe-3">
+            <!-- Navigation Pills for Order Entry -->
+            <ul class="nav nav-pills" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pills-dinein-tab" data-bs-toggle="pill" data-bs-target="#pills-dinein" type="button" role="tab" aria-controls="pills-dinein" aria-selected="true" onclick="changeTable('dineInTable')"><strong>DINE-IN</strong></button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-delivery-tab" data-bs-toggle="pill" data-bs-target="#pills-delivery" type="button" role="tab" aria-controls="pills-delivery" aria-selected="false" onclick="changeTable('deliveryTable')"><strong>DELIVERY</strong></button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-takeout-tab" data-bs-toggle="pill" data-bs-target="#pills-takeout" type="button" role="tab" aria-controls="pills-takeout" aria-selected="false" onclick="changeTable('takeOutTable')"><strong>TAKE-OUT</strong></button>
+                </li>
+            </ul>
+            <!-- Tab Content -->
+            <div class="tab-content" id="pills-tabContent">
+                <!-- Dine-In Table Order List Content -->
+                <div class="tab-pane show active" id="pills-dinein" role="tabpanel" aria-labelledby="pills-dinein-tab">
+                    <div class="order-list-table overflow-auto rounded">
+                        <table class="table" id="dineInTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width:35%;">Item Name</th>
+                                    <th scope="col" style="width:25%; text-align:center">Quantity</th>
+                                    <th scope="col" style="width:20%;">Price</th>
+                                    <th scope="col" style="width:20%;">Total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Delivery Table Order List Content -->
+                <div class="tab-pane" id="pills-delivery" role="tabpanel" aria-labelledby="pills-delivery-tab">
+                    <div class="order-list-table overflow-auto rounded">
+                        <table class="table" id="deliveryTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width:35%;">Item Name</th>
+                                    <th scope="col" style="width:25%; text-align:center">Quantity</th>
+                                    <th scope="col" style="width:20%;">Price</th>
+                                    <th scope="col" style="width:20%;">Total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Takeout Table Order List Content -->
+                <div class="tab-pane" id="pills-takeout" role="tabpanel" aria-labelledby="pills-takeout-tab">
+                    <div class="order-list-table overflow-auto rounded">
+                        <table class="table" id="takeOutTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width:35%;">Item Name</th>
+                                    <th scope="col" style="width:25%; text-align:center">Quantity</th>
+                                    <th scope="col" style="width:20%;">Price</th>
+                                    <th scope="col" style="width:20%;">Total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column order-subtotal pt-3 ps-3 pe-4">
+                <div class="d-flex flex-row justify-content-between mb-3">
+                    <span id="subTotalLabel"><strong>Subtotal:</strong></span>
+                    <span id="subTotal"><strong>₱0.00</strong></span>
+                </div>
+                <div class="d-flex flex-row justify-content-between mb-3">
+                    <span id="discountLabel"><strong>Discount:</strong></span>
+                    <span id="discount"><strong>₱0.00</strong></span>
+                </div>
+                <div class="d-flex flex-row justify-content-between invisible" id="additional">
+                    <span id="additionalFeeLabel"><strong></strong></span>
+                    <span id="additionalFee"><strong>₱0.00</strong></span>
+                </div>
+            </div>
+            <div class="d-flex flex-row pt-2 ps-3 pe-4 justify-content-between order-total">
+                <span id="totalLabel"><strong>Total:</strong></span>
+                <span class="text-white" id="total"><strong>₱0.00</strong></span>
+            </div>
+            <div class="d-flex flex-row justify-content-center list-buttons pt-3">
+                <button type="button" class="btn btn-secondary me-2" onclick="clearTable(true)"><strong>CLEAR</strong></button>
+                <button type="button" class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#discountModal"><strong>DISCOUNT</strong></button>
+                <button type="button" id="customerDetailsButton" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customerDetailsModal" disabled><strong>CUSTOMER DETAILS</strong></button>
+            </div>
+            <div class="d-flex flex-row justify-content-center list-buttons pt-3">
+                <button type="submit" id="sendOrderButton" class="btn btn-lg btn-success me-2" onclick="sendOrderPostRequest()"><strong>SEND ORDER</strong></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discount Modal -->
+    <div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="discountModalLabel">Discounts Modal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="discountForm">
+                        <!-- Discount Name -->
+                        <div class="mb-3 row">
+                            <label for="discountName" class="col-sm-4 col-form-label"><strong>Discount Name:</strong></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="discountName" name="discountName" required>
+                            </div>
+                        </div>
+                        <!-- Discount Amount -->
+                        <div class="mb-3 row">
+                            <label for="discountName" class="col-sm-4 col-form-label"><strong>Discount Amount:</strong></label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="discountAmount" name="discountAmount" max="100" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Button Row -->
+                        <div class="mb-3 row">
+                            <div class="d-flex flex-row-reverse">
+                                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button class="btn btn-danger me-2" onclick="removeDiscount()">Remove Discount</button>
+                                <button class="btn btn-warning me-2" type="submit">Apply Discount</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div class="modal fade" id="customerDetailsModal" tabindex="-1" aria-labelledby="customerDetailsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- Title -->
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-light" id="customerDetailsLabel">Customer Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="customerForm">
+                        <!-- Customer Name -->
+                        <div class="mb-3 row">
+                            <label for="customerName" class="col-sm-3 col-form-label"><strong>Customer Name:</strong></label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="customerName" required>
+                            </div>
+                        </div>
+                        <!-- Customer Address -->
+                        <div class="mb-3 row">
+                            <label for="customerAddress" class="col-sm-3 col-form-label"><strong>Customer Address:</strong></label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="customerAddress" required>
+                            </div>
+                        </div>
+                        <!-- Contact Details -->
+                        <div class="mb-3 row">
+                            <label for="contactDetails" class="col-sm-3 col-form-label"><strong>Contact Number:</strong></label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="contactDetails" required>
+                            </div>
+                        </div>
+                         <!-- Contact Details -->
+                         <div class="mb-3 row">
+                            <label for="contactDetails" class="col-sm-3 col-form-label"><strong>Delivery Fee:</strong></label>
+                            <div class="col-sm-9">
+                                <div class="input-group">
+                                    <span class="input-group-text">₱</span>
+                                    <input type="number" class="form-control" id="deliveryFeeAmount" required>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Payment Type -->
+                        <div class="mb-3 row">
+                            <label for="paymentType" class="col-sm-3 col-form-label"><strong>Payment Type:</strong></label>
+                            <div class="col-sm-9">
+                                <select class="form-select" size="2" aria-label="paymentType" id="paymentType" required>
+                                    <option value="Cash on Delivery">Cash on Delivery</option>
+                                    <option value="G-Cash">G-Cash</option>
+                                </select>
+                            </div>
+                        </div>
+                       
+                        <!-- Button Row -->
+                        <div class="mb-3 row">
+                            <div class="d-flex flex-row-reverse">
+                                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button class="btn btn-danger me-2" onclick="clearCustomerDetails()">Clear Customer Details</button>
+                                <button class="btn btn-primary me-2" type="submit">Add Customer Details</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toasts -->
+    <div class="toast-container position-fixed bottom-0 start-0">
+        <!-- Clear Toast -->
+        <div class="ps-2" style="z-index: 5; font-size:1.5rem">
+            <div id="clearToast" class="toast hide align-items-center text-white bg-secondary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" id="toast-message">
+                        Cleared list!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Successful Order Toast -->
+        <div class="ps-2" style="z-index: 5; font-size:1.5rem">
+            <div id="orderSentToast" class="toast hide align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" id="toast-message">
+                        Successfully sent order!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Details Toast -->
+        <div class="ps-2" style="z-index: 5; font-size:1.5rem">
+            <div id="customerDetailsToast" class="toast hide align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" id="toast-message">
+                        Added customer details!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Discount Toast -->
+        <div class="ps-2" style="z-index: 5; font-size:1.5rem">
+            <div id="discountToast" class="toast hide align-items-center text-white bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" id="toast-message">
+                        Discount applied!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Toast -->
+        <div class="ps-2 pe-2" style="z-index: 5; font-size:1.5rem">
+            <div id="errorToast" class="toast hide align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" id="errorToastMessage">
+                        <span></span>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+
+    </div> 
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/4b0653bbeb.js" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    var menu = {};
+    var categories = {};
+    var inventoryList = {};
+    var temporaryInventory = {};
+    var deductionList = [];
+
+    $(document).ready(function (){
+        getMenuList();
+        getMenuCategories();
+        getInventoryList();
+    });
+
+    var currentTable = "dineInTable"; //Set it to Dine-In Table by Default
+    var orderList = [];
+
+    var recipeItemArray = [];
+    var recipeQuantitiesArray = [];
+
+    var customerDetails = {deliveryFee: 0};
+    var discountDetails = {discountName: "None", discountAmount: 0};;
+
+    // Get Menu List Data
+    function getMenuList(){
+        $.ajax({
+            url: "menu_list"
+        }).done(function(data){
+            menu = data;
+        });
+    }
+    // Get Menu Category Data
+    function getMenuCategories(){
+        $.ajax({
+            url: "menu_category"
+        }).done(function(data){
+            categories = data;
+        });
+    }
+    // Get list of inventory items.
+    function getInventoryList(){
+        $.ajax({
+            url: "inventory_list"
+        }).done(function(data){
+            inventoryList = data;
+            temporaryInventory = inventoryList;
+        });
+    }
+
+    //Adds Row to Dine-In Table
+    function addItem(id){
+        $.get('convertUnits?id=' + id + "&quantity=1", function(response){
+            var noStock = 0;
+            for(recipeItem of response) {
+                if(!checkStock(recipeItem)) noStock++;
+            }
+
+            if(noStock>0) errorToast("No more stocks for this menu item.");
+            else{
+                var tableObject = document.getElementById(currentTable);
+                var toBeAddedMenuItem;
+
+                //Search for the Menu Item
+                for(item of menu){
+                    if(item["_id"] == id){toBeAddedMenuItem = item;}
+                }
+
+                if(!orderList.includes(toBeAddedMenuItem)){
+                    orderList.push(toBeAddedMenuItem);
+                    var price = 0;
+                    
+                    if(typeof toBeAddedMenuItem["menuPrice"] == "object") price = toBeAddedMenuItem["menuPrice"]["$numberDecimal"];
+                    else if(typeof toBeAddedMenuItem["menuPrice"] == "string") price = toBeAddedMenuItem["menuPrice"];
+                    
+                    var nextRow = tableObject.rows.length;
+                    var toBeAddedRow = 
+                    `<tr id="`+currentTable+"Row"+nextRow+`">
+                        <td>`+ toBeAddedMenuItem["menuName"] +`</td>
+                        <td class="d-flex flex-row justify-content-center">
+                            <button class="btn btn-sm btn-danger" type="button" onclick="decrementQuantity('`+toBeAddedMenuItem["_id"]+`', '`+nextRow+`')"><i class="fas fa-minus"></i></button>
+                            <input id="`+toBeAddedMenuItem["_id"]+`_quantity" readonly type="number" value="1" style="width: 50px; text-align:center" class="form-control form-control-sm">
+                            <button class="btn btn-sm btn-success" type="button" onclick="incrementQuantity('`+toBeAddedMenuItem["_id"]+`')"><i class="fas fa-plus"></i></button>
+                        </td>
+                        <td>₱`+ parseFloat(price).toFixed(2) +`</td>
+                        <td id="`+toBeAddedMenuItem["_id"]+`_total" onchange="console.log('changed')">₱`+ parseFloat(price).toFixed(2) +`</td>
+                    </tr>`;
+
+                    $("#"+currentTable+" tbody").append(toBeAddedRow); //Add this row as the next row.
+                    deductInventory(id);
+                }else incrementQuantity(id);
+                totalPrices();
+            }
+        });
+    }
+    //Increment the Quantity of an Menu Item Row
+    function incrementQuantity(id){
+        var currentQuantity = parseInt($("#"+id+"_quantity").val());
+        $.get('convertUnits?id=' + id + "&quantity=1", function(response){
+            var noStock = 0;
+            for(recipeItem of response) {
+                if(!checkStock(recipeItem)) noStock++;
+            }
+
+            if(noStock == 0) {
+                deductInventory(id);
+                var newQuantity = currentQuantity + 1;
+                $("#"+id+"_quantity").val(newQuantity);
+                updateRowPrice(id);
+                totalPrices();
+            }
+            else errorToast("No more stocks for this menu item.");
+        })
+    }
+    //Decrement the Quantity of an Menu Item Row        
+    function decrementQuantity(id){
+        var currentQuantity = parseInt($("#"+id+"_quantity").val());
+        var row = -1;
+        addInventory(id);
+        //Get recipe list of menu item.
+        for(item of menu) if(item["_id"] == id) recipeList = item["menuRecipe"];
+
+        if(currentQuantity > 1){
+            $("#"+id+"_quantity").val(currentQuantity-1);
+        }else if(currentQuantity == 1){
+            for(var i = 0; i < orderList.length; i++){
+                if(orderList[i]["_id"] == id){
+                    row = i+1;
+                }
+            }
+            orderList.splice(row-1, 1);
+            $("#"+currentTable+" tbody #"+currentTable+"Row"+row).remove();
+            resetTableId();
+        }
+
+        updateRowPrice(id);
+        totalPrices();
+    }
+    //Check stock of item
+    function checkStock(recipeItem){
+        for(inventoryItem of temporaryInventory){
+            if(inventoryItem["inventoryItemName"] == recipeItem["itemName"]){
+                var ending = parseFloat(inventoryItem["inventoryItemEnding"]["$numberDecimal"]);
+                if(ending < recipeItem["itemQuantity"]) return false;
+            }
+        };
+        return true;
+    }
+    
+    //Deduct from temporary stock 
+    function deductInventory(id){
+        $.get('convertUnits?id=' + id + "&quantity=1", function(recipeList){
+            for(recipeItem of recipeList) {
+                temporaryInventory.forEach(function(inventoryItem, i){
+                    if(inventoryItem["inventoryItemName"] == recipeItem["itemName"]){
+                        var deduction = parseFloat(recipeItem["itemQuantity"]);
+                        var used = parseFloat(inventoryItem["inventoryItemUsed"]["$numberDecimal"]) + deduction;
+                        var ending = parseFloat(inventoryItem["inventoryItemEnding"]["$numberDecimal"]) - deduction;
+                        
+                        var amount = parseFloat(ending) / parseFloat(inventoryItem["inventoryItemUnitQuantity"]);
+
+                        temporaryInventory[i]["inventoryItemEnding"]["$numberDecimal"] = ending;
+                        temporaryInventory[i]["inventoryItemUsed"]["$numberDecimal"] = used;
+                        temporaryInventory[i]["inventoryItemAmount"] = amount;
+                        
+                        console.log(inventoryItem["inventoryItemName"]+ " - Before: "+ parseFloat(inventoryItem["inventoryItemBefore"]["$numberDecimal"]) +" Used: " + used + " Ending: "+ ending +" Amount: " + amount);
+                    }
+                });
+            }
+        });
+    }
+    //Re-add to temporary stock
+    function addInventory(id){
+        $.get('convertUnits?id=' + id + "&quantity=1", function(recipeList){
+            for(recipeItem of recipeList) {
+                temporaryInventory.forEach(function(inventoryItem, i){
+                    if(inventoryItem["inventoryItemName"] == recipeItem["itemName"]){
+                        var add = parseFloat(recipeItem["itemQuantity"]);
+                        var used = parseFloat(inventoryItem["inventoryItemUsed"]["$numberDecimal"]) - add;
+                        var ending = parseFloat(inventoryItem["inventoryItemEnding"]["$numberDecimal"]) + add;
+                        
+                        var amount = parseFloat(ending) / parseFloat(inventoryItem["inventoryItemUnitQuantity"]);
+
+                        temporaryInventory[i]["inventoryItemEnding"]["$numberDecimal"] = ending;
+                        temporaryInventory[i]["inventoryItemUsed"]["$numberDecimal"] = used;
+                        temporaryInventory[i]["inventoryItemAmount"] = amount;
+                        
+
+                        console.log(inventoryItem["inventoryItemName"]+ " - Before: "+ parseFloat(inventoryItem["inventoryItemBefore"]["$numberDecimal"]) +" Used: " + used + " Ending: "+ ending +" Amount: " + amount);
+                    }
+                });
+            }
+        });
+    }
+
+    //Change the identifier for what table is currently selected
+    function changeTable(table){
+        clearTable(false);
+
+        if(table == "deliveryTable"){ //If Delivery, show additionalFee
+            $("#customerDetailsButton").prop('disabled', false);
+            $("#additional").removeClass("invisible");
+            $("#additionalFeeLabel > strong").text("Delivery Fee:");
+        }else{
+            $("#customerDetailsButton").prop('disabled', true);
+            $("#additional").addClass("invisible");
+            clearCustomerDetails();
+        }
+        currentTable = table;
+        removeDiscount();
+    }
+    //Update the row price when using incrementQuantity/decrementQuantity
+    function updateRowPrice(id){
+        var menuItem;
+        for(item of menu){
+            if(item["_id"] == id){
+                menuItem = item;
+            }
+        }
+        var currentQuantity = parseInt($("#"+id+"_quantity").val());
+
+        var itemPrice = 0;
+        if(typeof menuItem["menuPrice"] == "object") itemPrice = menuItem["menuPrice"]["$numberDecimal"];
+        else if(typeof menuItem["menuPrice"] == "string") itemPrice = menuItem["menuPrice"];
+        
+        var newTotal = currentQuantity * itemPrice;
+        $("#"+id+"_total").text("₱"+newTotal.toFixed(2));
+        totalPrices();
+    }
+    
+    //Reset the tableId's when removing a row.
+    function resetTableId(){
+        var currentRowCount = document.getElementById(currentTable).rows.length;
+        var rowNumber = 1;
+        $("#"+currentTable+" > tbody > tr").each(function (){
+            $(this).attr("id", currentTable+"Row"+rowNumber);
+            rowNumber++;
+        });
+        totalPrices();
+    } 
+    //Clear the table.
+    function clearTable(toastAppear){
+        getInventoryList();
+        deductionList = [];
+        orderList = []; //Clear orderList array.
+        $("#"+currentTable+" > tbody > tr").remove(); //Remove all rows from body of table.
+        if(toastAppear) $('#clearToast').toast('show');
+        totalPrices(); //Recompute totals.
+    }
+    
+    //Get the Subtotal of all items.
+    function subTotalPrices(){
+        var subTotalValue = 0;
+        // Loop through current order list and total prices.
+        for(item of orderList){
+            var quantity = document.getElementById(item["_id"]+"_quantity").value;
+            var price = 0;
+            if(typeof item["menuPrice"] == "object") price = item["menuPrice"]["$numberDecimal"];
+            else if(typeof item["menuPrice"] == "string") price = item["menuPrice"];
+            var total = quantity*price;
+            subTotalValue += total;
+        }
+
+        $("#subTotal > strong").text("₱" + parseFloat(subTotalValue).toFixed(2));
+        return subTotalValue;
+    }
+    //Apply Discount to Subtotal
+    function applyDiscount(){
+        var discountName = document.getElementById("discountName");
+        var discountValue = document.getElementById("discountAmount").value;
+        var discountSubtract = subTotalPrices() * (discountValue/100);
+        
+        if(discountValue != ""){
+            $("#discountLabel > strong").text("Discount: (" + discountName.value + ") -" + discountValue + "%");
+        }
+        $("#discount > strong").text("₱" + parseFloat(discountSubtract).toFixed(2));
+        return discountSubtract;
+    }
+    //Get the total of all items.
+    function totalPrices(){
+        var discount = applyDiscount();
+        var subTotal = subTotalPrices();
+        var delivery = customerDetails["deliveryFee"];
+
+        var total = (subTotal+delivery)-discount;
+
+        $("#total > strong").text("₱" + parseFloat(total).toFixed(2));
+        return total;
+    }
+    
+    //Submit customer details and save it to customerDetails object.
+    $('#customerForm').submit(function() { 
+        var customerModal = document.getElementById('customerDetailsModal');
+        var modal = bootstrap.Modal.getInstance(customerModal);
+
+        //Get customer values
+        var name = document.getElementById("customerName").value;
+        var address = document.getElementById("customerAddress").value;
+        var contact = document.getElementById("contactDetails").value;
+        var fee = parseFloat(document.getElementById("deliveryFeeAmount").value); 
+        var payment = document.getElementById("paymentType").value;
+        
+        $("#additionalFee > strong").text("₱" + fee.toFixed(2)); //Set label to inputted delivery fee.
+        //Save to customerDetails object.
+        customerDetails = {customerName: name, customerAddress: address, customerContact: contact, deliveryFee: fee, paymentType: payment};
+        totalPrices(); //Recompute totalPrice.
+        modal.hide(); //Hide modal after submission
+        $('#customerDetailsToast').toast('show'); //Show toast.
+        return false;
+    });  
+    //Submit discount details and save it to discountDetails object.
+    $('#discountForm').submit(function() { 
+        var discountModal = document.getElementById('discountModal');
+        var modal = bootstrap.Modal.getInstance(discountModal);
+        var name = document.getElementById("discountName").value;
+        var amount = document.getElementById("discountAmount").value;
+        
+        //Save it to discountDetails
+        discountDetails = {discountName: name, discountAmount: amount};
+        totalPrices(); //Recompute totalPrice.
+        modal.hide(); //Hide modal after submission.
+        $('#discountToast').toast('show'); //Show toast.
+        return false;
+    });
+    
+    //Clear any applied discount
+    function removeDiscount(){
+        var discountModal = document.getElementById('discountModal');
+        var modal = bootstrap.Modal.getInstance(discountModal);
+        
+        //Clear the modal input forms and label.
+        document.getElementById("discountName").value = "";
+        document.getElementById("discountAmount").value = "";
+        $("#discountLabel > strong").text("Discount:");
+
+        //Reset discount details object.
+        discountDetails = {discountName: "None", discountAmount: 0};
+        totalPrices(); //Recompute price.
+        modal.hide();
+        
+    }
+    //Clear customer details.
+    function clearCustomerDetails(){
+        document.getElementById("customerName").value = "";
+        document.getElementById("customerAddress").value = "";
+        document.getElementById("contactDetails").value = "";
+        document.getElementById("deliveryFeeAmount").value = "";
+        document.getElementById("paymentType").value = "";
+
+        $("#additionalFee > strong").text("₱0.00");
+        customerDetails = {deliveryFee: 0}; //Set deliveryFee to 0.
+        totalPrices(); //Recompute totalPrice
+    }
+    //Show errorToast
+    function errorToast(message){
+        $("#errorToastMessage > span").text(message); //Set toast message. 
+        $("#errorToast").toast('show'); //Show toast
+    }
+    
+    //Search function for Menu Items
+    function searchMenu(){
+        var searchValue = document.getElementById("searchBar").value;
+        var searchResult;
+        $.get('search_menu?value=' + searchValue, function(responseText) {
+            $("#allMenuItems .menu-item-link").remove();
+            for(item of responseText){
+                if(item["menuStatus"] == true){
+                    var row = 
+                    `<a class="menu-item-link" onclick="addItem('`+item['_id']+`')">
+                        <div class="d-flex flex-column justify-content-center p-1 me-3 ms-3" style="width: 175px; height: 175px;">
+                            <img src="/menuImages/`+item['menuImage']+`" class="menu-image rounded m-2" alt="...">
+                            <span class="text-center text-nowrap"><strong>`+item['menuName']+`</strong></span>
+                            <span class="text-center text-success"><strong>₱`+parseFloat(item['menuPrice']['$numberDecimal']).toFixed(2)+`</strong></span>
+                        </div>
+                    </a>`;
+                    $("#allMenuItems").append(row);
+                }
+            }
+        });
+    }
+    
+    //Send data to server through post request.
+    function sendOrderPostRequest(){
+        if(orderList == undefined || orderList.length == 0){ //Check if there are any orders at all.
+            errorToast("No orders!");
+        }else{ //If there are orders, send it.
+            var orderEntry = new XMLHttpRequest();
+            orderEntry.open("POST", "sendOrder", true);
+            orderEntry.setRequestHeader('Content-Type', 'application/json');
+
+            var total = totalPrices();
+            var orderDetailsArray = [];
+            var type = "";
+
+            //Loop through Order List and push to array orders that are going to be sent to server.
+            for(item of orderList){
+                var toBeSentItem = item;
+                var quantity = document.getElementById(item["_id"]+"_quantity").value;
+    
+                var price = 0;
+                if(typeof item["menuPrice"] == "object") price = item["menuPrice"]["$numberDecimal"];
+                else if(typeof item["menuPrice"] == "string") price = item["menuPrice"];
+    
+                var subTotal = quantity*price;
+                toBeSentItem["menuPrice"] = price;
+
+                orderDetailsArray.push({orderItem: toBeSentItem, orderQuantity: quantity, orderItemTotal: subTotal, orderItemStatus: "Pending"});
+            }
+
+            applyTemporaryStock();
+
+            if(currentTable == "dineInTable") {
+                orderEntry.send(JSON.stringify({orderDetails: orderDetailsArray, orderType: "Dine-In", orderTotal: total, orderStatus: "Pending", discount: discountDetails}));
+            }
+            else if(currentTable == "deliveryTable") {
+                if(customerDetails["customerName"] == null){
+                    errorToast("No customer details!");
+                    return;
+                }else {
+                    orderEntry.send(JSON.stringify({orderDetails: orderDetailsArray, orderType: "Delivery", orderTotal: total, orderStatus: "Pending", customerDetails: customerDetails, discount: discountDetails}));
+                    clearCustomerDetails();
+                }
+            }
+            else if(currentTable == "takeOutTable") {
+                orderEntry.send(JSON.stringify({orderDetails: orderDetailsArray, orderType: "Take-Out", orderTotal: total, orderStatus: "Pending", discount: discountDetails}));
+            }
+            
+            getInventoryList();
+            $('#orderSentToast').toast('show'); //Show order sent toast.
+            clearTable(false); //Clear table after sending order.
+        }
+    }
+
+    function applyTemporaryStock(){
+        temporaryInventory.forEach(function(inventoryItem,i){
+            var ending = inventoryItem["inventoryItemEnding"]["$numberDecimal"];
+            var used = inventoryItem["inventoryItemUsed"]["$numberDecimal"];
+            var amount  = inventoryItem["inventoryItemAmount"]; 
+            var reason = "Temporary stock deduction for "+inventoryItem["inventoryItemName"]+". [Order Entry]";
+
+            $.ajax({ 
+                url: '/applyTemporary',
+                type: 'POST',
+                cache: false, 
+                data: {id: inventoryItem["_id"], ending: ending, used: used, amount: amount, reason: reason},
+                success: function(data){
+                    console.log('Added Inventory Item Stock!');
+                }
+                ,error: function(jqXHR, textStatus, err){
+                    console.log('Error: '+textStatus+', err '+err)
+                }
+            })
+
+            console.log(inventoryItem["inventoryItemName"]+ " - Before: "+ parseFloat(inventoryItem["inventoryItemBefore"]["$numberDecimal"]) +" Used: " + used + " Ending: "+ ending +" Amount: " + amount);
+        })
+    }
+</script>
+</html>

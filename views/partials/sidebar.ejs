@@ -3,36 +3,25 @@
         <li><a href="/" class="link-light"><i class="fas fa-home fa-2x"></i></a></li>
         <li class="border-top my-3"></li>
         <li class="mb-1">
-            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#inventory-collapse" aria-expanded="false">
-            Inventory
+            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#management-collapse" aria-expanded="false">
+            Inventory and Menu
             </button>
-            <div class="collapse <% if (pageTitle == "Menu Inventory" || pageTitle == "Ingredients Inventory") {%> <%="show"%><% } %>" id="inventory-collapse">
+            <div class="collapse <% if (pageTitle == "Menu Management" || pageTitle == "Inventory Management" || pageTitle == "Inventory Logs") {%> <%="show"%><% } %>" id="management-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li><a href="/menu_inventory" class="link-light rounded">Menu Management</a></li>
-                    <li><a href="/ingredients_inventory" class="link-light rounded">Inventory Management</a></li>
+                    <li><a href="/menu_management" class="link-light rounded">Menu Management</a></li>
+                    <li><a href="/inventory_management" class="link-light rounded">Inventory Management</a></li>
+                    <li><a href="/inventory_logs" class="link-light rounded">Inventory Logs</a></li>
                 </ul>
             </div>
          </li>
         <li class="mb-1">
-            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
-            Orders
+            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#order-collapse" aria-expanded="false">
+            Orders Management
             </button>
-            <div class="collapse" id="dashboard-collapse">
+            <div class="collapse <% if (pageTitle == "Kitchen Order Tickets" || pageTitle == "Order List") {%> <%="show"%><% } %>"" id="order-collapse">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                <li><a href="/dinein_orders" class="link-light rounded">Dine-In Orders</a></li>
-                <li><a href="/delivery_orders" class="link-light rounded">Delivery Orders</a></li>
-            </ul>
-            </div>
-        </li>
-        <li class="mb-1">
-            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
-            Kitchen Order Tickets
-            </button>
-            <div class="collapse" id="orders-collapse">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                <li><a href="/new_kot" class="link-light rounded">New</a></li>
-                <li><a href="/pending_kot" class="link-light rounded">Pending</a></li>
-                <li><a href="/completed_kot" class="link-light rounded">Completed</a></li>
+                <li><a href="/pending_kot" class="link-light rounded">Kitchen Order Tickets</a></li>
+                <li><a href="/order_management" class="link-light rounded">Order List</a></li>
             </ul>
             </div>
         </li>

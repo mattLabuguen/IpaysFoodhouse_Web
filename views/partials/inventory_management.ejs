@@ -1,0 +1,832 @@
+<div class="d-flex flex-row justify-content-end">
+    <div class="input-group mb-3 w-25 me-auto">
+        <input type="text" class="form-control" placeholder="Search by Name" aria-label="Search" aria-describedby="basic-addon1" id="searchBar" onkeyup="searchInventoryList()" onsearch="searchInventoryList()">
+    </div>
+    <button type="button" class="btn btn-success h-50 me-3" data-bs-toggle="modal" data-bs-target="#stockInInvoice" onclick="addStockInRow()"><b>Stock-In New Item</b> <i class="fas fa-plus-circle"></i></button>
+    <button type="button" class="btn btn-primary h-50 me-3" data-bs-toggle="modal" data-bs-target="#restockItems" onclick="addRestockRow()"><b>Restock Items</b> <i class="fas fa-plus-circle"></i></button>
+    <button type="button" class="btn btn-danger h-50 me-3" data-bs-toggle="modal" data-bs-target="#manualStockOut" onclick="addStockOutRow()"><b>Outgoing Inventory</b> <i class="fas fa-minus-circle"></i></button>
+    <button type="button" class="btn btn-warning h-50" data-bs-toggle="modal" data-bs-target="#edit_category"><b>Edit Categories&nbsp;</b> <i class="fas fa-clipboard-list"></i></button>
+</div>
+
+<table class="table table-striped table-hover table-bordered">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 1%">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="mainCheck" onchange="checkAll()">
+                </div>  
+            </th>
+            <th scope="col" style="width: 1%">ID</th>
+            <th scope="col" style="width: 10%">Inventory Item Name</th>
+            <th scope="col" style="width: 3%">Category</th>
+            <th scope="col" style="width: 3%">Unit Quantity</th>
+            <th scope="col" style="width: 4%">Unit of Measure</th>
+            <th scope="col" style="width: 4%">Item Cost</th>
+            <th scope="col" style="width: 4%">Items In-Stock</th>
+            <th scope="col" style="width: 1%">Before</th>
+            <th scope="col" style="width: 1%">Used</th>
+            <th scope="col" style="width: 1%">Ending</th>
+            <th scope="col" style="width: 4%">Used Cost</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        
+      </tbody>
+</table>
+
+<!-- Stock-In Modal -->
+<div class="modal fade" id="stockInInvoice" tabindex="-1" aria-labelledby="stockInInvoice" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <!-- Title -->
+        <div class="modal-header bg-success">
+            <h5 class="modal-title text-light" id="stockInInvoice">Stock-In New Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="stockInForm" onsubmit="stockInInvoice(); return false;" class="needs-validation">        
+                <div class="input-group mb-3 row me-auto">
+                    <label for="dateOfPurchase" class="col-sm-3 col-form-label"><b>Date of Purchase: </b></label>
+                    <div class="col-sm-5">
+                        <input type="date" class="form-control" id="stockInDate" required>
+                    </div>
+                </div>
+                <table class="table" id="inputTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">Item Name</th>
+                            <th style="width: 15%">Category</th>
+                            <th style="width: 15%">Unit Quantity</th>
+                            <th style="width: 15%">Unit of Measure</th>
+                            <th style="width: 15%">Unit Cost</th>
+                            <th style="width: 10%">Item Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>     
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>
+                                <div class="d-flex flex-row">
+                                    <a class="btn" onclick="addStockInRow()"><b><i class="fas fa-plus-circle text-success"></i></b></a>
+                                    <a class="btn" onclick="removeStockInRow()"><b><i class="fas fa-minus-circle text-danger"></i></b></a>
+                                </div>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="mb-3 row">
+                    <div class="d-flex flex-row-reverse">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-success me-2" type="submit">Stock In</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Outgoing Inventory Modal -->
+<div class="modal fade" id="manualStockOut" tabindex="-1" aria-labelledby="manualStockOut" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title text-white" id="manualStockOut">Outgoing Inventory</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="manualStockOut(); return false;">        
+                    <div class="input-group mb-3 row me-auto">
+                        <label for="dateOfStockOut" class="col-sm-1 col-form-label"><b>Date: </b></label>
+                        <div class="col-sm-5">
+                            <input type="date" class="form-control" id="stockOutDate" required>
+                        </div>
+                        <label for="stockOutReason" class="col-sm-1 col-form-label"><b>Reason: </b></label>
+                        <div class="col-sm-5">
+                            <textarea class="form-control" id="stockOutReason" required></textarea>
+                        </div>
+                    </div>
+                    <table class="table" id="stockOutTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Item Name</th>
+                                <th style="width: 15%">Unit Quantity</th>
+                                <th style="width: 15%">Unit of Measure</th>
+                            </tr>
+                        </thead>
+                        <tbody>     
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>
+                                    <div class="d-flex flex-row">
+                                        <a class="btn" onclick="addStockOutRow()"><b><i class="fas fa-plus-circle text-success"></i></b></a>
+                                        <a class="btn" onclick="removeStockOutRow()"><b><i class="fas fa-minus-circle text-danger"></i></b></a>
+                                    </div>
+                                </td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="mb-3 row">
+                        <div class="d-flex flex-row-reverse">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-danger me-2" type="submit">Change Stock</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Restock Modal -->
+<div class="modal fade" id="restockItems" tabindex="-1" aria-labelledby="manualStockOut" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white" id="restockItemsTitle">Restock Items</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="restockItems(); return false;">        
+                    <div class="input-group mb-3 row me-auto">
+                        <label for="restockDate" class="col-sm-2 col-form-label"><b>Restock Date: </b></label>
+                        <div class="col-sm-5">
+                            <input type="date" class="form-control" id="restockDate" required>
+                        </div>
+                    </div>
+                    <table class="table" id="restockTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Item Name</th>
+                                <th style="width: 15%">Item Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>     
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>
+                                    <div class="d-flex flex-row">
+                                        <a class="btn" onclick="addRestockRow()"><b><i class="fas fa-plus-circle text-success"></i></b></a>
+                                        <a class="btn" onclick="removeRestockRow()"><b><i class="fas fa-minus-circle text-danger"></i></b></a>
+                                    </div>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="mb-3 row">
+                        <div class="d-flex flex-row-reverse">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-primary me-2" type="submit">Change Stock</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inventory Category Modal -->
+<div class="modal fade" id="edit_category" tabindex="-1" aria-labelledby="editCategoryModal" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-white" id="editCategoryModal">Edit Inventory Categories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Add Category" id="addCategory">
+                    <button class="btn btn-success" type="button" onclick="addCategoryRow()">Submit</button>
+                </div>
+                <form onsubmit="editInventoryCategories(); return false;">
+                    <table class="table" id="categoryTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Category Name</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div class="mb-3 row">
+                        <div class="d-flex flex-row-reverse">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-warning me-2" type="submit">Submit Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container position-fixed bottom-0 end-0" id="toastContainer">
+    <!-- Success Toast -->
+    <div class="pe-2 pb-2" style="z-index: 5; font-size:1.5rem">
+        <div id="successToast" class="toast hide align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="successToastMessage">
+                    <span><strong></strong></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <!-- Danger Toast -->
+    <div class="pe-2 pb-2" style="z-index: 5; font-size:1.5rem">
+        <div id="dangerToast" class="toast hide align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="dangerToastMessage">
+                    <span><strong></strong></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    var inventoryList = {};
+    var categories = {};
+    var unitList = {};
+
+    $(document).ready(function(){
+        getInventoryList();
+        getInventoryCategories();
+        getUnitList();
+    });
+
+    var checkedRowsArray = [];
+    var checkedRowItems;
+    var checkRows = document.getElementsByName("checkRow");
+    var mainCheck = document.getElementById("mainCheck");
+    var inputTable = document.getElementById("inputTable");
+
+    var editCategoryTable = document.getElementById("categoryTable");
+    var editUnitTable = document.getElementById("unitTable");
+    
+    var addCategory = document.getElementById("addCategory");
+    var addUnit = document.getElementById("addUnit");
+
+    var editCategoryModal = document.getElementById('edit_category');
+    var stockInModal = document.getElementById("stockInInvoice");
+    var stockOutModal = document.getElementById("manualStockOut");
+    var restockModal = document.getElementById("restockItems");
+    
+    // Get list of inventory items.
+    function getInventoryList(){
+        $.ajax({
+            url: "inventory_list"
+        }).done(function(data){
+            inventoryList = data;
+            loadInventoryTable();
+        });
+    }
+    // Get list of inventory categories
+    function getInventoryCategories(){
+        $.ajax({
+            url: "inventory_categories"
+        }).done(function(data){
+            categories = data;
+            loadCategories();
+        });
+    }
+    // Get list of inventory units
+    function getUnitList(){
+        $.ajax({
+            url: "inventory_units"
+        }).done(function(data){
+            unitList = data;
+        });
+    }
+    
+    // Load inventory table
+    function loadInventoryTable(){
+        $("#tableBody tr").remove();
+        var id = 1;
+    
+        for(inventoryItem of inventoryList){
+            var cost = (parseFloat(inventoryItem["inventoryItemUsed"]["$numberDecimal"] / parseFloat(inventoryItem["inventoryItemUnitQuantity"]))) * parseFloat(inventoryItem["inventoryItemUnitCost"]["$numberDecimal"]);
+
+            var row = `<tr>
+                <td><input class="form-check-input" type="checkbox" value='`+inventoryItem["_id"]+`' name="checkRow"></td>
+                <td>`+id+`</td>
+                <td class="d-flex flex-row justify-content-between"><span>`+inventoryItem["inventoryItemName"]+`</span>`;
+            
+            if(inventoryItem["inventoryItemEnding"]["$numberDecimal"] <= (inventoryItem["inventoryItemBefore"]["$numberDecimal"]*0.10))
+                row+= `<span class="ms-2 badge rounded-pill bg-danger">Low Stock</span>`
+            else if (inventoryItem["inventoryItemEnding"]["$numberDecimal"] <= (inventoryItem["inventoryItemBefore"]["$numberDecimal"]*0.50))
+                row+= `<span class="ms-2 badge rounded-pill bg-warning">Minimal Stock</span>`
+            else row+= `<span class="ms-2 badge rounded-pill bg-success">Good Stock</span>`
+            
+            row += 
+                `</td>
+                <td>`+inventoryItem["inventoryItemCategory"]+`</td>
+                <td>`+inventoryItem["inventoryItemUnitQuantity"]+`</td>
+                <td>`+inventoryItem["inventoryItemUnitMeasure"]+`</td>
+                <td>₱`+inventoryItem["inventoryItemUnitCost"]["$numberDecimal"]+`</td>
+                <td>`+parseFloat(inventoryItem["inventoryItemAmount"]).toFixed(2)+`</td>
+                <td class="table-success">`+ parseFloat(inventoryItem["inventoryItemBefore"]["$numberDecimal"]).toFixed(2) + inventoryItem["inventoryItemUnitMeasure"] +`</td>
+                <td class="table-primary">`+ parseFloat(inventoryItem["inventoryItemUsed"]["$numberDecimal"]).toFixed(2) + inventoryItem["inventoryItemUnitMeasure"] +`</td>
+                <td class="table-danger">`+ parseFloat(inventoryItem["inventoryItemEnding"]["$numberDecimal"]).toFixed(2) + inventoryItem["inventoryItemUnitMeasure"] +`</td>
+                <td>₱`+cost.toFixed(2)+`</td>
+            </tr>`
+            id++;
+            $("#tableBody").append(row);
+        }
+    }
+    // Search through inventory list
+    function searchInventoryList(){
+        var searchValue = document.getElementById("searchBar").value;
+        console.log(searchValue);
+        resetCheckboxes();
+        $.get('search_inventory?value=' + searchValue, function(responseText) {
+            $("#tableBody tr").remove();
+            var id = 1;
+            for(inventoryItem of responseText){
+                var cost = (parseFloat(inventoryItem["inventoryItemEnding"]["$numberDecimal"] / parseFloat(inventoryItem["inventoryItemUnitQuantity"]))) * parseFloat(inventoryItem["inventoryItemUnitCost"]["$numberDecimal"]);
+
+                var row = `<tr>
+                    <td><input class="form-check-input" type="checkbox" value='`+inventoryItem["_id"]+`' name="checkRow"></td>
+                    <td>`+id+`</td>
+                    <td><span>`+inventoryItem["inventoryItemName"]+`</span>`;
+                
+                if(inventoryItem["inventoryItemEnding"]["$numberDecimal"] <= (inventoryItem["inventoryItemBefore"]["$numberDecimal"]*0.10))
+                    row+= `<span class="ms-2 badge rounded-pill bg-danger">Low Stock</span>`
+                else if (inventoryItem["inventoryItemEnding"]["$numberDecimal"] <= (inventoryItem["inventoryItemBefore"]["$numberDecimal"]*0.50))
+                    row+= `<span class="ms-2 badge rounded-pill bg-warning">Minimal Stock</span>`
+                else row+= `<span class="ms-2 badge rounded-pill bg-success">Good Stock</span>`
+                
+                row += 
+                    `</td>
+                    <td>`+inventoryItem["inventoryItemCategory"]+`</td>
+                    <td>`+inventoryItem["inventoryItemUnitQuantity"]+`</td>
+                    <td>`+inventoryItem["inventoryItemUnitMeasure"]+`</td>
+                    <td>₱`+inventoryItem["inventoryItemUnitCost"]["$numberDecimal"]+`</td>
+                    <td>`+parseFloat(inventoryItem["inventoryItemAmount"]).toFixed(2)+`</td>
+                    <td class="table-success">`+ parseFloat(inventoryItem["inventoryItemBefore"]["$numberDecimal"]).toFixed(2) + inventoryItem["inventoryItemUnitMeasure"] +`</td>
+                    <td class="table-primary">`+ parseFloat(inventoryItem["inventoryItemUsed"]["$numberDecimal"]).toFixed(2) + inventoryItem["inventoryItemUnitMeasure"] +`</td>
+                    <td class="table-danger">`+ parseFloat(inventoryItem["inventoryItemEnding"]["$numberDecimal"]).toFixed(2) + inventoryItem["inventoryItemUnitMeasure"] +`</td>
+                    <td>₱`+cost.toFixed(2)+`</td>
+                </tr>`
+                id++;
+                $("#tableBody").append(row);
+            }
+        });
+    }
+
+    // Checks all the checkboxes when the main check box is checked.
+    function checkAll(){
+        checkedRowsArray = []; // Clear checked checkboxes first.
+        if(mainCheck.checked){ // If Main Check is checked, loop through all checkboxes and change value to true.
+            for(row of checkRows){
+                row.checked = true;
+                checkedRowsArray.push(row.value);
+            }
+        }
+        else {
+            for(row of checkRows) row.checked = false;
+            checkedRowsArray = [];  
+        }
+    }
+    // Reset checkboxes
+    function resetCheckboxes(){
+        mainCheck.checked = false;
+        for(row of checkRows) row.checked = false;
+        checkedRowsArray = [];
+    }
+
+    // Add a row for stocking in new items.
+    function addStockInRow(){
+        var nextRow = inputTable.rows.length - 1;
+        var newRow = `<tr id="row`+ nextRow +`" name="stockInRow">
+            <td>
+                <input type="text" class="form-control" id="stockInInventoryName`+nextRow+`" name="stockInInventoryName" required onkeyup="checkStock(this.value, `+nextRow+`)">
+                <div class="invalid-feedback">
+                    Item exists.
+                </div>
+            </td>
+            <td>
+                <select class="form-select" size="1" id="selectInventoryCategory" name="stockInInventoryCategory" required>`;
+        
+        for(category of categories[0]["categoryArray"]) newRow+= `<option value="`+category+`">`+category+`</option>`;
+        
+        newRow +=`</select>
+            </td>
+            <td><input type="number" min="1" step="any" class="form-control" id="inventoryUnitQuantity" name="stockInInventoryUnitQuantity" required></td>
+            <td>
+                <select class="form-select" size="1" id="selectInventoryUnit" name="stockInInventoryUnitMeasure" required>`
+
+        for(unit of unitList["mass"]) newRow+= `<option value="`+unit["abbr"]+`">`+unit["abbr"]+` (`+unit["plural"]+`)</option>`;
+        for(unit of unitList["volume"]) newRow+= `<option value="`+unit["abbr"]+`">`+unit["abbr"]+` (`+unit["plural"]+`)</option>`;
+        for(unit of unitList["misc"]) newRow+= `<option value="`+unit["abbr"]+`">`+unit["abbr"]+` (`+unit["plural"]+`)</option>`;
+        
+        newRow+=`</select>
+            </td>
+            <td>
+                <div class="input-group">
+                    <span class="input-group-text">₱</span>
+                    <input type="number" min="1" step="any" class="form-control" id="inventoryUnitCost" name="stockInInventoryUnitCost" required>
+                </div>
+            </td>
+            <td><input type="number" min="1" step="any" class="form-control" id="inventoryAmount" name="stockInInventoryAmount" required></td>
+        </tr>`;
+        $("#inputTable tbody").append(newRow);
+    }
+    // Remove a row for stocking in new items.
+    function removeStockInRow(){
+        var currentRow = inputTable.rows.length - 2;
+        console.log(currentRow);
+        $('#row' + currentRow).remove();
+    }
+    
+    // Add a row for outgoing inventory
+    function addStockOutRow(){
+        var nextRow = stockOutTable.rows.length - 1;
+        var newRow = `<tr id="row`+ nextRow +`" name="stockOutRow">
+            <td>`
+        newRow +=`<select class="form-select" size="1" id="stockOutItemName`+nextRow+`" name="stockOutInventoryItems" onchange="getStockOutMeasure('`+nextRow+`')" required>
+            <option disabled selected value></option>`;
+        
+        for(inventoryItem of inventoryList) newRow += `<option value="`+inventoryItem["inventoryItemName"]+`">`+inventoryItem["inventoryItemName"]+`</option>`;
+        
+        newRow += `</select>       
+            </td>
+            <td>
+                <input type="number" min="1" id="stockOutInventoryUnitQuantity`+nextRow+`" step="any" class="form-control" name="stockOutInventoryUnitQuantity" required onkeyup="remainingStock(`+nextRow+`)">
+                <div class="invalid-feedback">
+                    Quantity greater than current stock.
+                </div>
+            </td>
+            <td>
+                <select class="form-select" size="1" id="stockOutInventoryUnitMeasure`+nextRow+`" name="stockOutInventoryUnitMeasure" required onchange="remainingStock(`+nextRow+`)"></select>
+            </td>
+        </tr>`;
+        $("#stockOutTable tbody").append(newRow);
+    }
+    // Remove a row for outgoing inventory
+    function removeStockOutRow(){
+        var currentRow = stockOutTable.rows.length - 2;
+        console.log(currentRow);
+        $('#row' + currentRow).remove();
+    }
+    
+    // Add a row for restocking items.
+    function addRestockRow(){
+        var nextRow = restockTable.rows.length - 1;
+        var newRow = `<tr id="restockRow`+ nextRow +`" name="restockRow">
+            <td>`
+        newRow +=`<select class="form-select" size="1" id="restockItemName`+nextRow+`" name="restockInventoryItems" required>
+            <option disabled selected value></option>`;
+        
+        for(inventoryItem of inventoryList) newRow += `<option value="`+inventoryItem["inventoryItemName"]+`">`+inventoryItem["inventoryItemName"]+`</option>`;
+        
+        newRow += `</select>       
+            </td>
+            <td>
+                <input type="number" min="1" id="restockInventoryAmount`+nextRow+`" step="any" class="form-control" name="restockInventoryAmount" required>
+                <div class="invalid-feedback">
+                    Quantity greater than current stock.
+                </div>
+            </td>
+        </tr>`;
+        $("#restockTable tbody").append(newRow);
+    }
+    // Remove a row for restocking items.
+    function removeRestockRow(){
+        var currentRow = restockTable.rows.length - 2;
+        console.log(currentRow);
+        $('#restockRow' + currentRow).remove();
+    }
+
+    // Add a category row
+    function addCategoryRow(){
+        var nextRow = editCategoryTable.rows.length;
+        var toBeAddedRow = 
+        `<tr id="categoryRow`+nextRow+`" name="addRow">
+            <td><input hidden value="`+addCategory.value+`" name="categories">`+addCategory.value+`</td>
+            <td>
+                <a class="btn btn-sm text-danger h-25" id="removeCategory" onclick="removeCategoryRow(`+nextRow+`)"><i class="fas fa-minus-circle"></i></a>
+            </td>
+        </tr>`;
+        addCategory.value = "";
+        $("#categoryTable tbody").append(toBeAddedRow);
+    }
+    // Remove a category row
+    function removeCategoryRow(rowNumber){
+        var row = rowNumber;
+        $("#categoryRow"+row).remove();
+    }
+    // Load categories
+    function loadCategories(){
+        $("#categoryTable tbody tr").remove();
+        var id = 1;
+        for(category of categories[0]["categoryArray"]){
+            var toBeAddedRow = `<tr id="categoryRow`+id+`">
+                <td><input hidden value="`+category+`" name="categories">`+category+`</td>
+                <td>
+                    <a class="btn btn-sm text-danger h-25" id="removeCategory" onclick="removeCategoryRow(`+id+`)"><i class="fas fa-minus-circle"></i></a>
+                </td>                
+            </tr>`
+            $("#categoryTable tbody").append(toBeAddedRow);
+            id++;
+        }
+    }
+
+    // Modal Events
+    stockInModal.addEventListener('hidden.bs.modal', function(event){
+        $("#inputTable tbody tr").remove();
+    });
+
+    stockOutModal.addEventListener('hidden.bs.modal', function(event){
+        $("#stockOutTable tbody tr").remove();
+    });
+
+    restockModal.addEventListener('hidden.bs.modal', function(event){
+        $("#restockTable tbody tr").remove();
+    })
+    
+    editCategoryModal.addEventListener('hidden.bs.modal', function(event){
+        addCategory.value = "";
+        loadCategories();
+    });
+
+    // Stock in one or several items.
+    function stockInInvoice(){
+        var inventoryItemArray = [];
+        var inventoryDate = document.getElementById("stockInDate").value;
+
+        var inventoryNameArray = document.getElementsByName("stockInInventoryName");
+        var inventoryCategoryArray = document.getElementsByName("stockInInventoryCategory");
+        var inventoryUnitQuantityArray = document.getElementsByName("stockInInventoryUnitQuantity");
+        var inventoryUnitMeasureArray = document.getElementsByName("stockInInventoryUnitMeasure");
+        var inventoryUnitCostArray = document.getElementsByName("stockInInventoryUnitCost");
+        var inventoryAmountArray = document.getElementsByName("stockInInventoryAmount");
+        
+        for(i = 0; i < inventoryNameArray.length; i++){
+            var stockInItem = {
+                inventoryStockInDate: inventoryDate, 
+                inventoryItemName: inventoryNameArray[i].value,
+                inventoryItemCategory: inventoryCategoryArray[i].value,
+                inventoryItemUnitQuantity: inventoryUnitQuantityArray[i].value,
+                inventoryItemUnitMeasure: inventoryUnitMeasureArray[i].value,
+                inventoryItemUnitCost: inventoryUnitCostArray[i].value,
+                inventoryItemAmount: inventoryAmountArray[i].value,
+                inventoryItemBefore: inventoryAmountArray[i].value * inventoryUnitQuantityArray[i].value,
+                inventoryItemUsed: 0,
+                inventoryItemEnding: inventoryAmountArray[i].value * inventoryUnitQuantityArray[i].value,
+            }
+            inventoryItemArray.push(stockInItem);
+        }
+
+        var checkValidity = $("input[name=stockInInventoryName]").attr("class").split(" ");
+        if(!checkValidity.includes("is-invalid")){
+            $.ajax({ 
+                url: '/stockInInvoice',
+                type: 'POST',
+                cache: false, 
+                data: {stockInItems: inventoryItemArray},
+                success: function(data){
+                    console.log('Added Inventory Item Stock!');
+                }
+                ,error: function(jqXHR, textStatus, err){
+                    console.log('Error: '+textStatus+', err '+err)
+                }
+            })
+            .done(function(){
+                getInventoryList();
+                $("#stockInInvoice").modal('toggle');
+                successToast("Added Inventory Item/s!", 3000);
+            });
+        }else{
+            dangerToast("Some items are in stock!", 3000);
+        }
+    }
+    // Restock one or several items.
+    function restockItems(){
+        var restockArray = [];
+        var restockDate = document.getElementById("restockDate").value;
+        
+        var restockItemsArray = document.getElementsByName("restockInventoryItems");
+        var restockItemsInventoryAmount = document.getElementsByName("restockInventoryAmount");
+
+        for(i=0; i < restockItemsArray.length; i++){
+            restockArray.push({
+                inventoryItemName: restockItemsArray[i].value,
+                inventoryItemAmount: restockItemsInventoryAmount[i].value,
+            })
+        }
+
+        restockArray.forEach(function(item, i){
+            $.ajax({ 
+                url: '/restockItems',
+                type: 'POST',
+                cache: false, 
+                data: {itemName: item["inventoryItemName"], itemAmount: item["inventoryItemAmount"]},
+                success: function(data){
+                    console.log('Updated Inventory Item Stock!');
+                }
+                ,error: function(jqXHR, textStatus, err){
+                    console.log('Error: '+textStatus+', err '+err)
+                }
+            }).done(function(){
+                getInventoryList();
+                $("#restockItems").modal('toggle');
+                successToast("Updated stock of Inventory Item/s!", 3000);
+            });
+        });
+        
+    }
+    // Stock out several or one item at once.
+    function manualStockOut(){
+        var stockOutArray = [];
+        var inventoryStockOutDate = document.getElementById("stockOutDate").value;
+        var inventoryStockOutReason = document.getElementById("stockOutReason").value;
+
+        var inventoryItemsArray = document.getElementsByName("stockOutInventoryItems");
+        var inventoryUnitQuantityArray = document.getElementsByName("stockOutInventoryUnitQuantity");
+        var inventoryUnitMeasureArray = document.getElementsByName("stockOutInventoryUnitMeasure");
+        
+        for(i = 0; i < inventoryItemsArray.length; i++){
+            stockOutArray.push({
+                inventoryItemName: inventoryItemsArray[i].value,
+                inventoryItemUnitQuantity: inventoryUnitQuantityArray[i].value,
+                inventoryItemUnitMeasure: inventoryUnitMeasureArray[i].value,
+            });
+        }
+    
+        var checkValidity = $("input[name=stockOutInventoryUnitQuantity]").attr("class").split(" ");
+        if(!checkValidity.includes("is-invalid")){
+            stockOutArray.forEach(function(item, i){
+                if(item["inventoryItemUnitMeasure"] == "pcs" || item["inventoryItemUnitMeasure"] == "pkg"){
+                    $.ajax({ 
+                        url: '/outgoingMisc',
+                        type: 'POST',
+                        cache: false, 
+                        data: {itemName: item["inventoryItemName"], itemQuantity: item["inventoryItemUnitQuantity"], reason: inventoryStockOutReason},
+                        success: function(data){
+                            console.log('Updated Inventory Item Stock!');
+                        }
+                        ,error: function(jqXHR, textStatus, err){
+                            console.log('Error: '+textStatus+', err '+err)
+                        }
+                    }).done(function(){
+                        getInventoryList();
+                        $("#manualStockOut").modal('toggle');
+                        successToast("Updated stock of Inventory Item/s!", 3000);
+                    });
+                }else{
+                    $.ajax({ 
+                        url: '/outgoingUnits',
+                        type: 'POST',
+                        cache: false, 
+                        data: {itemName: item["inventoryItemName"], itemQuantity: item["inventoryItemUnitQuantity"], itemMeasure: item["inventoryItemUnitMeasure"], reason: inventoryStockOutReason},
+                        success: function(data){
+                            console.log('Updated Inventory Item Stock!');
+                        }
+                        ,error: function(jqXHR, textStatus, err){
+                            console.log('Error: '+textStatus+', err '+err)
+                        }
+                    }).done(function(){
+                        getInventoryList();
+                        $("#manualStockOut").modal('toggle');
+                        successToast("Updated stock of Inventory Item/s!", 3000);
+                    });
+                }
+            });
+        }
+    }
+    // Check if item is in stock.
+    function checkStock(itemName, i){
+        $.get('checkInStock?name=' + itemName, function(status) {
+            if(!status){
+                $("#stockInInventoryName" + i).removeClass("is-invalid");
+                $("#stockInInventoryName" + i).addClass("is-valid");
+            }
+            else{
+                $("#stockInInventoryName" + i).removeClass("is-valid");
+                $("#stockInInventoryName" + i).addClass("is-invalid");
+            }
+        })
+    }
+    // Check the remaining stock number.
+    function remainingStock(rowNumber){
+        $.get(
+            'remainingStock?name=' + $("#stockOutItemName" + rowNumber).val()  + 
+            '&quantity=' + $("#stockOutInventoryUnitQuantity" + rowNumber).val()  + 
+            '&measure=' + $("#stockOutInventoryUnitMeasure" + rowNumber).val(),
+            function(status) {
+                if(status){
+                    $("#stockOutInventoryUnitQuantity" + (rowNumber)).removeClass("is-invalid");
+                    $("#stockOutInventoryUnitQuantity" + (rowNumber)).addClass("is-valid");
+                }
+                else{
+                    $("#stockOutInventoryUnitQuantity" + (rowNumber)).removeClass("is-valid");
+                    $("#stockOutInventoryUnitQuantity" + (rowNumber)).addClass("is-invalid");
+                }
+        })
+    }
+    // Get the unit of measure of an outgoing item.
+    function getStockOutMeasure(rowNumber){
+        inventoryList.forEach(function(inventoryItem, i) {
+            if(inventoryItem["inventoryItemName"] == $("#stockOutItemName" + rowNumber).val()){
+                $("#stockOutInventoryUnitMeasure" + rowNumber + " option").remove();
+                if(inventoryItem["inventoryItemUnitMeasure"] == "pkg" || inventoryItem["inventoryItemUnitMeasure"] == "pcs"){
+                    $("#stockOutInventoryUnitMeasure" + rowNumber).append($('<option>', { 
+                        value: inventoryItem["inventoryItemUnitMeasure"],
+                        text : inventoryItem["inventoryItemUnitMeasure"], 
+                    }));
+                }else{
+                    $.get('unitMeasure?measure=' + inventoryItem["inventoryItemUnitMeasure"], function(responseText) {
+                        for(unit of responseText){
+                            $("#stockOutInventoryUnitMeasure" + rowNumber).append($('<option>', { 
+                                value: unit["abbr"],
+                                text : unit["abbr"] + " (" + unit["plural"] + ")",
+                            }));
+                        }
+                    });
+                }
+            }
+        })
+    }
+    // Get the unit of measure of a restock item.
+    function getRestockMeasure(rowNumber){
+        inventoryList.forEach(function(inventoryItem, i) {
+            if(inventoryItem["inventoryItemName"] == $("#restockItemName" + rowNumber).val()){
+                $("#restockInventoryUnitMeasure" + rowNumber + " option").remove();
+                if(inventoryItem["inventoryItemUnitMeasure"] == "pkg" || inventoryItem["inventoryItemUnitMeasure"] == "pcs"){
+                    $("#restockInventoryUnitMeasure" + rowNumber).append($('<option>', { 
+                        value: inventoryItem["inventoryItemUnitMeasure"],
+                        text : inventoryItem["inventoryItemUnitMeasure"], 
+                    }));
+                }else{
+                    $.get('unitMeasure?measure=' + inventoryItem["inventoryItemUnitMeasure"], function(responseText) {
+                        for(unit of responseText){
+                            $("#restockInventoryUnitMeasure" + rowNumber).append($('<option>', { 
+                                value: unit["abbr"],
+                                text : unit["abbr"] + " (" + unit["plural"] + ")",
+                            }));
+                        }
+                    });
+                }
+            }
+        })
+    }
+    // Edit the inventory categories
+    function editInventoryCategories(){
+        var editCategoryArray = [];
+        var editedCategories = document.getElementsByName("categories");
+        for(i = 0; i < editedCategories.length; i++) editCategoryArray.push(editedCategories[i].value);
+        
+        $.ajax({ 
+            url: '/editInventoryCategory',
+            type: 'POST',
+            cache: false, 
+            data: {editedCategories: editCategoryArray},
+            success: function(data){
+                console.log('Edited Inventory Categories!');
+            }
+            ,error: function(jqXHR, textStatus, err){
+                console.log('Error: '+textStatus+', err '+err)
+            }
+        })
+        .done(function(){
+            getInventoryCategories();
+            $("#edit_category").modal('toggle');
+            successToast("Categories edited!", 3000);
+        });
+    }
+
+    // Show Successful toast
+    function successToast(message, time){
+        $("#successToastMessage > span > strong").text(message); //Set toast message. 
+        $("#successToast").toast('show'); //Show toast
+        setTimeout(function(){
+            $("#successToast").toast('hide');
+        }, time)
+    }
+    // Show Danger Toast
+    function dangerToast(message, time){
+        $("#dangerToastMessage > span > strong").text(message); //Set toast message. 
+        $("#dangerToast").toast('show'); //Show toast
+        setTimeout(function(){
+            $("#dangerToast").toast('hide');
+        }, time)
+    }
+
+</script>

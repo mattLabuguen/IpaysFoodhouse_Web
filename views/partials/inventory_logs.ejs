@@ -1,0 +1,104 @@
+<div class="d-flex flex-row justify-content-end">
+    <div class="input-group mb-3 w-25 me-auto">
+        <input type="text" class="form-control" placeholder="Search by Name" aria-label="Search" aria-describedby="basic-addon1" id="searchBar" onkeyup="searchLogs()" onsearch="searchLogs()">
+    </div>
+</div>
+
+<table class="table table-striped table-hover table-bordered">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 5%">ID</th>
+            <th scope="col" style="width: 15%">Log Date</th>
+            <th scope="col" style="width: 25%">Inventory Item Name</th>
+            <th scope="col" style="width: 5%">Amount</th>
+            <th scope="col" style="width: 10%">Unit of Measure</th>
+            <th scope="col" style="width: 40%">Reason</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        
+      </tbody>
+</table>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    var logList = {};
+    var dateOption = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'};
+
+    $(document).ready(function(){
+        getLogList();
+    });
+
+    function getLogList(){
+        $.ajax({
+            url: "logs_list"
+        }).done(function(data){
+            logList = data;
+            loadLogsList();
+        });
+    }
+
+    function loadLogsList(){
+        $("#tableBody tr").remove();
+
+        var id = 1;
+        for(item of logList){
+            var logDate = new Date(item["inventoryLogDate"]);
+            var formattedDate = logDate.toLocaleDateString("en-US", dateOption);
+            
+            var row =
+            `<tr>
+                <td>`+id+`</td>
+                <td>`+formattedDate+`</td>
+                <td><span>`+item["inventoryItemName"]+`</span>`
+            
+            if(parseFloat(item["inventoryItemAmount"]["$numberDecimal"]) > 0){
+                row += `<td class="text-end table-success">`+parseFloat(item["inventoryItemAmount"]["$numberDecimal"]).toFixed(2)+`</td>`
+            }else{
+                row += `<td class="text-end table-danger">`+parseFloat(item["inventoryItemAmount"]["$numberDecimal"]).toFixed(2)+`</td>`
+            }
+            
+            row += 
+                `<td>`+item["inventoryItemUnitMeasure"]+`</td>
+                <td>`+item["inventoryLogReason"]+`</td>
+            </tr>`;
+
+            $("#tableBody").append(row);
+            id++;
+        }
+    }
+
+    function searchLogs(){
+        var searchValue = document.getElementById("searchBar").value;
+        $.get('search_logs?value=' + searchValue, function(responseText) {
+            $("#tableBody tr").remove();
+            var id = 1;
+            for(item of responseText){
+                var logDate = new Date(item["inventoryLogDate"]);
+                var formattedDate = logDate.toLocaleDateString("en-US", dateOption);
+                
+                var row =
+                `<tr>
+                    <td>`+id+`</td>
+                    <td>`+formattedDate+`</td>
+                    <td><span>`+item["inventoryItemName"]+`</span>`
+                
+                if(parseFloat(item["inventoryItemAmount"]["$numberDecimal"]) > 0){
+                    row += `<td class="text-end table-success">`+parseFloat(item["inventoryItemAmount"]["$numberDecimal"]).toFixed(2)+`</td>`
+                }else{
+                    row += `<td class="text-end table-danger">`+parseFloat(item["inventoryItemAmount"]["$numberDecimal"]).toFixed(2)+`</td>`
+                }
+                
+                row += 
+                    `<td>`+item["inventoryItemUnitMeasure"]+`</td>
+                    <td>`+item["inventoryLogReason"]+`</td>
+                </tr>`;
+
+                $("#tableBody").append(row);
+                id++;
+            }
+        });
+    }
+
+</script>

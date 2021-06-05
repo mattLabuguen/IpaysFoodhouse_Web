@@ -3,10 +3,18 @@ const Schema = mongoose.Schema;
 
 const inventoryUnitsSchema = new Schema(
     {
-        "unitArray":{
+        "massUnits":{
             type: Array,
-            required: true
+            required: false
         },
+        "volumeUnits":{
+            type: Array,
+            required: false,
+        },
+        "miscUnits":{
+            type: Array,
+            required: false
+        }
     }, {timestamps: true}
 );
 
